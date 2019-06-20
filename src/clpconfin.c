@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <libxml/tree.h>
 #include <libxml/parser.h>
+#include <libxml/xmlstring.h>
 
 #include "clpcreate.h"
 
@@ -32,103 +33,35 @@ init
 }
 
 
-xmlDocPtr
-read_xml
+int
+set_value
 (
-	char *filename
+	xmlDocPtr doc,
+	char *path,
+	char *value
 )
 {
-	xmlDocPtr doc;
-	doc = xmlParseFile(filename);
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr	target_node = NULL;
+	xmlNodePtr	new_text = NULL;
+	char		curr[1024];
+	int			ret = 0;
 
-	return doc;
+	strcpy(curr, "/root");
+	root_node = xmlDocGetRootElement(doc);
+	target_node = find_value_node(doc, root_node, path, curr);
+
+	if (value != NULL)
+	{
+		new_text = xmlNewText(value);
+		xmlAddChild(target_node, new_text);
+	}
+
+	return ret;
 }
 
 
 xmlNodePtr
-add_node
-(
-	xmlNodePtr node,
-	char *node_name,
-	char *text,
-	char *attr,
-	char *attr_var
-)
-{
-	xmlNodePtr new_node = NULL;
-	xmlNodePtr new_text = NULL;
-
-	new_node = xmlNewNode(NULL, node_name);
-
-	if (text != NULL)
-	{
-		new_text = xmlNewText(text);
-		xmlAddChild(new_node, new_text);
-	}
-	
-	if (attr != NULL)
-	{
-		xmlNewProp(new_node, attr, attr_var);
-	}
-
-	xmlAddChild(node, new_node);
-}
-
-
-int
-seek
-(
-	xmlNodePtr node,
-	char *curr,
-	char *path
-)
-{
-	char element[1024];
-	char *p;
-	int ret;
-
-	printf("curr: %s\n", curr);
-	printf("path: %s\n", path);
-	if (!strcmp(curr, path))
-	{
-		return 0;
-	}
-
-	strcpy(element, &path[strlen(curr) + 1]);
-	
-	p = strchr(element, '/');
-	if (p != NULL)
-	{
-		*p = '\0';
-	}
-	
-	p = strchr(element, '@');
-	if (p != NULL)
-	{
-		*p = '\0';
-//		strcpy(attribute, ++p);
-	}
-	printf("element: %s\n", element);
-
-	for (node = node->children; node != NULL; node = node->next)
-	{
-		printf("node->name: %s\n", node->name);
-		if (!strcmp(node->name, element))
-		{
-			printf("Bingo!!\n");
-			strcat(curr, "/");
-			strcat(curr, element);
-			ret = seek(node, curr, path);
-			if (!ret)
-			{
-				return 0;
-			}
-		}
-	}
-	return 1;
-}
-
-int
 find_child_node
 (
 	xmlDocPtr doc,
@@ -137,20 +70,30 @@ find_child_node
 	char *attribute
 )
 {
-	printf("element: %s\n", element);
+	xmlNodePtr ret_node = NULL;
+	xmlNodePtr n;
 	
-//	for (node = doc->children; node != NULL; node = node->next)
-	for (node = doc->children; node != NULL; node = node->next)
+	for (n = node->children; n != NULL; n = n->next)
 	{
-		printf("node->name: %s\n", node->name);
-//		seek(node);
+		printf("node->name: %s\n", n->name);
+		printf("element is %s\n", element);
+		if (!strcmp(n->name, element))
+		{
+			printf("Hit\n");
+			if (strlen(attribute) > 0)
+			{
+
+			}
+			ret_node = n;
+			break;
+		}
 	}
 
-	return 0;
+	return ret_node;
 }
 
 
-int
+xmlNodePtr
 find_value_node
 (
 	xmlDocPtr doc,
@@ -159,6 +102,7 @@ find_value_node
 	char *curr
 )
 {
+	xmlNodePtr ret_node;
 	char element[1024];
 	char attribute[1024];
 	char *p;
@@ -184,24 +128,54 @@ find_value_node
 		strcpy(attribute, ++p);
 	}
 
-	ret = find_child_node(doc, node, element, attribute);
-	if (ret != 0)
+	ret_node = find_child_node(doc, node, element, attribute);
+	if (ret_node == NULL)
 	{
-		
+		ret_node = make_child_node(node, element, attribute);
 	}
 	/* continue? */
 	strcat(curr, "/");
 	strcat(curr, element);
-
+	
 	if (strlen(attribute) > 0)
 	{
 		strcat(curr, "@");
 		strcat(curr, attribute);
 	}
-
+	
 	if (strcmp(path, curr) != 0)
 	{
-//		ret = find_value_node(doc, node->children, path, curr);
+		ret_node = find_value_node(doc, ret_node, path, curr);
 	}
 	
+func_exit:
+
+	return ret_node;
+}
+
+
+xmlNodePtr
+make_child_node
+(
+	xmlNodePtr node,
+	char *node_name,
+	char *attr_var
+)
+{
+	xmlNodePtr new_node = NULL;
+	xmlNodePtr ret_node;
+	int ret = 0;
+	char attr_name[1024];
+
+	new_node = xmlNewNode(NULL, node_name);
+
+	if (strlen(attr_var) > 0)
+	{
+		strcpy(attr_name, "name");
+		xmlNewProp(new_node, attr_name, attr_var);
+	}
+
+	ret_node = xmlAddChild(node, new_node);
+	printf("add node\n");
+	return ret_node;
 }

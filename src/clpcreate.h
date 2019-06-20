@@ -16,8 +16,10 @@ enum _func_retval__
  */
  //clpconfin.c
 int init(void);
-xmlDocPtr read_xml(char *filename);
-xmlNodePtr add_node(xmlNodePtr node, char *node_name, char *text, char *attr, char *attr_var);
+int set_value(xmlDocPtr doc, char *path, char *curr);
+xmlNodePtr find_value_node(xmlDocPtr doc, xmlNodePtr node, char *path, char *curr);
+xmlNodePtr find_child_node(xmlDocPtr doc, xmlNodePtr node, char *element, char *attribute);
+xmlNodePtr make_child_node(xmlNodePtr node, char *node_name, char *attr_var);
 
 //clpcreate.c
 int add_cls(char *clsname, char *lang, char *os);

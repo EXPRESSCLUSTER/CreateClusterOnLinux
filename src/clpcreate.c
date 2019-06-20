@@ -19,7 +19,6 @@ main(
 	xmlDocPtr	doc;
 	xmlNodePtr	root_node = NULL;
 	xmlNodePtr	new_node = NULL;
-	char		*output_file;
 	int			ret;
 
 	if (!strcmp(argv[1], "init"))
@@ -27,8 +26,6 @@ main(
 		init();
 		goto func_exit;
 	}
-
-	
 
 	if (!strcmp(argv[1], "add"))
 	{
@@ -45,18 +42,7 @@ main(
 	{
 		printf("invalid parameter (argv[1]: %s) \n", argv[1]);
 	}
-/* 
-	new_node = add_node(root_node, "cluster", "mytest", NULL, NULL);
-	new_node = add_node(root_node, "server", "server1", NULL, NULL);
-	new_node = add_node(root_node, "server", "", NULL, NULL);
-	new_node = add_node(root_node, "resource", NULL, NULL, NULL);
-	new_node = add_node(new_node, "fip", "fip1", "attr", "test_attr");
 
-	xmlSaveFormatFileEnc(output_file, doc, "UTF-8", 1);
-
-	xmlFreeDoc(doc);
-	xmlCleanupParser();
-*/
 func_exit:
 	return 0;
 }
@@ -70,8 +56,22 @@ add_cls
 	char *os
 )
 {
+	xmlDocPtr doc;
 
-	func_exit:
+	doc = xmlParseFile("clp.conf");
+
+	set_value(doc, "/root/all/charset", lang);
+	set_value(doc, "/root/all/serveros", os);
+	set_value(doc, "/root/all/encode", lang);
+	set_value(doc, "/root/cluster/name", clsname);
+	set_value(doc, "/root/cluster/comment", "");
+
+	xmlSaveFormatFileEnc("clp.conf", doc, "UTF-8", 1);
+
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+
+func_exit:
 	return 0;
 }
 
@@ -83,7 +83,16 @@ add_srv
 	char *priority
 )
 {
+	xmlDocPtr doc;
 
-	func_exit:
+	doc = xmlParseFile("clp.conf");
+	
+
+	xmlSaveFormatFileEnc("clp.conf", doc, "UTF-8", 1);
+
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+
+func_exit:
 	return 0;
 }
