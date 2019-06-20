@@ -15,7 +15,7 @@ enum _func_retval__
  * prototype
  */
  //clpconfin.c
-int init(void);
+int init(char *encoding);
 int set_value(xmlDocPtr doc, char *path, char *curr);
 xmlNodePtr find_value_node(xmlDocPtr doc, xmlNodePtr node, char *path, char *curr);
 xmlNodePtr find_child_node(xmlDocPtr doc, xmlNodePtr node, char *element, char *attribute);
@@ -24,10 +24,10 @@ xmlNodePtr make_child_node(xmlNodePtr node, char *node_name, char *attr_var);
 //clpcreate.c
 int add_cls(char *clsname, char *lang, char *os);
 int add_srv(char *srvname, char *priority);
+int add_ip(char *srvname, char *id, char *ipaddr);
+int add_hb(char *id, char *priority);
 /* 
 int add_hba(IN char *srvname, IN char *id, IN char *tag, IN char *param);
-int add_ip(IN char *srvname, IN char *id, IN char *ipaddr);
-int add_hb(IN char *id, IN char *priority);
 int add_diskhb(IN char *id, IN char *priority);
 int add_diskhbsrv(IN char *srvname, IN char *id, IN char *info);
 int add_grp(IN char *grptype, IN char *grpname);
@@ -41,8 +41,6 @@ int add_pingnp(IN char *npname, IN char *priority, IN char *id, IN char *grpid, 
 int add_disknp(IN char *npname, IN char *priority, IN char *id);
 int add_pingnpsrv(IN char *srvname, IN char *id, IN char *grpid);
 int add_disknpsrv(IN char *srvname, IN char *id, IN char *guid, IN char *letter);
-int add_obj_num(IN char *objnum);
-int add_encode(IN char *encode);
 */
 
 #endif

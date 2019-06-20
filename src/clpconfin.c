@@ -12,7 +12,7 @@
 int
 init
 (
-	void
+	char *encoding
 )
 {
 	xmlDocPtr	doc;
@@ -24,7 +24,7 @@ init
 	doc = xmlNewDoc("1.0");
 	root_node = xmlNewNode(NULL, "root");
 	xmlDocSetRootElement(doc, root_node);
-	xmlSaveFormatFileEnc(output_file, doc, "UTF-8", 1);
+	xmlSaveFormatFileEnc(output_file, doc, encoding, 1);
 
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
@@ -36,9 +36,9 @@ init
 int
 set_value
 (
-	xmlDocPtr doc,
-	char *path,
-	char *value
+	xmlDocPtr	doc,
+	char		*path,
+	char		*value
 )
 {
 	xmlNodePtr	root_node = NULL;
@@ -64,10 +64,10 @@ set_value
 xmlNodePtr
 find_child_node
 (
-	xmlDocPtr doc,
-	xmlNodePtr node,
-	char *element,
-	char *attribute
+	xmlDocPtr	doc,
+	xmlNodePtr	node,
+	char		*element,
+	char		*attribute
 )
 {
 	xmlNodePtr ret_node = NULL;
@@ -75,18 +75,16 @@ find_child_node
 	
 	for (n = node->children; n != NULL; n = n->next)
 	{
-		printf("node->name: %s\n", n->name);
-		printf("element is %s\n", element);
 		if (!strcmp(n->name, element))
 		{
 			if (strlen(attribute) > 0)
 			{
-				if (strcmp(n->properties->name, attribute) != 0)
+				if (strcmp(xmlGetProp(n, n->properties->name), attribute) != 0)
 				{
 					continue;
 				}
 			}
-			printf("Hit!\n");
+
 			ret_node = n;
 			break;
 		}
@@ -99,21 +97,17 @@ find_child_node
 xmlNodePtr
 find_value_node
 (
-	xmlDocPtr doc,
-	xmlNodePtr node,
-	char *path, 
-	char *curr
+	xmlDocPtr	doc,
+	xmlNodePtr	node,
+	char		*path, 
+	char		*curr
 )
 {
-	xmlNodePtr ret_node;
-	char element[1024];
-	char attribute[1024];
-	char *p;
-
-	int ret;
-
-	printf("path: %s\n", path);
-	printf("curr: %s\n", curr);
+	xmlNodePtr	ret_node;
+	char		element[1024];
+	char		attribute[1024];
+	char		*p;
+	int			ret;
 
 	strcpy(element, &path[strlen(curr) + 1]);
 	strcpy(attribute, "");
@@ -160,25 +154,32 @@ func_exit:
 xmlNodePtr
 make_child_node
 (
-	xmlNodePtr node,
-	char *node_name,
-	char *attr_var
+	xmlNodePtr	node,
+	char		*node_name,
+	char		*attr_var
 )
 {
-	xmlNodePtr new_node = NULL;
-	xmlNodePtr ret_node;
-	int ret = 0;
-	char attr_name[1024];
+	xmlNodePtr	new_node = NULL;
+	xmlNodePtr	ret_node;
+	int			ret = 0;
+	char		attr_name[1024];
 
 	new_node = xmlNewNode(NULL, node_name);
 
 	if (strlen(attr_var) > 0)
 	{
-		strcpy(attr_name, "name");
+		if (!strcmp(node_name, "device") | !strcmp(node_name, "list") | !strcmp(node_name, "hba") | !strcmp(node_name, "grp"))
+		{
+			strcpy(attr_name, "id");
+		}
+		else
+		{
+			strcpy(attr_name, "name");
+		}
+
 		xmlNewProp(new_node, attr_name, attr_var);
 	}
 
 	ret_node = xmlAddChild(node, new_node);
-	printf("add node\n");
 	return ret_node;
 }
