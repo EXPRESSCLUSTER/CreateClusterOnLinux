@@ -79,11 +79,14 @@ find_child_node
 		printf("element is %s\n", element);
 		if (!strcmp(n->name, element))
 		{
-			printf("Hit\n");
 			if (strlen(attribute) > 0)
 			{
-
+				if (strcmp(n->properties->name, attribute) != 0)
+				{
+					continue;
+				}
 			}
+			printf("Hit!\n");
 			ret_node = n;
 			break;
 		}

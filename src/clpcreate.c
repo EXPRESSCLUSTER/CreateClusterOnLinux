@@ -37,6 +37,10 @@ main(
 		{
 			add_srv(argv[3], argv[4]);
 		}
+		else if (!strcmp(argv[2], "objnum"))
+		{
+			add_obj_num(argv[3]);
+		}
 	}
 	else
 	{
@@ -83,10 +87,38 @@ add_srv
 	char *priority
 )
 {
-	xmlDocPtr doc;
+	xmlDocPtr	doc;
+	char 		path[1024];
 
 	doc = xmlParseFile("clp.conf");
 	
+	strcpy(path, "/root/server@");
+	strcat(path, srvname);
+	strcat(path, "/priority");
+	set_value(doc, path, priority);
+
+	xmlSaveFormatFileEnc("clp.conf", doc, "UTF-8", 1);
+
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+
+func_exit:
+	return 0;
+}
+
+
+int
+add_obj_num
+(
+	char *objnum
+)
+{
+	xmlDocPtr	doc;
+	char 		path[1024];
+
+	doc = xmlParseFile("clp.conf");
+	
+	set_value(doc, "/root/webmgr/client/objectnumber", objnum);
 
 	xmlSaveFormatFileEnc("clp.conf", doc, "UTF-8", 1);
 
