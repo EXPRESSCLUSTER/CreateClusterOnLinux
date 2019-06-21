@@ -97,9 +97,7 @@ add_srv
 {
 	char 		path[1024];
 	
-	strcpy(path, "/root/server@");
-	strcat(path, srvname);
-	strcat(path, "/priority");
+	sprintf(path, "/root/server@%s/priority", srvname);
 	set_value(g_doc, path, priority);
 
 func_exit:
@@ -117,19 +115,11 @@ add_ip
 {
 	char 		path[1024];
 	
-	strcpy(path, "/root/server@");
-	strcat(path, srvname);
-	strcat(path, "/device@");
-	strcat(path, id);
-	strcat(path, "/type");
+	sprintf(path, "/root/server@%s/device@%s/type", srvname, id);
 	set_value(g_doc, path, "lan");
-	strcpy(path, "/root/server@");
-	strcat(path, srvname);
-	strcat(path, "/device@");
-	strcat(path, id);
-	strcat(path, "/info");
+
+	sprintf(path, "/root/server@%s/device@%s/info", srvname, id);
 	set_value(g_doc, path, ipaddr);
-	//need to create additional func for reducing redundancy
 
 func_exit:
 	return 0;
@@ -152,14 +142,13 @@ add_hb
 	i++;
 	sprintf(dev_number, "%d", i);
 	
+	sprintf(path, "/root/heartbeat/types@lankhb");
 	set_value(g_doc, "/root/heartbeat/types@lankhb", "");
-	strcpy(path, "/root/heartbeat/lankhb@lankhb");
-	strcat(path, dev_number);
-	strcat(path, "/priority");
+
+	sprintf(path, "/root/heartbeat/lankhb@lankhb%s/priority", dev_number);
 	set_value(g_doc, path, priority);
-	strcpy(path, "/root/heartbeat/lankhb@lankhb");
-	strcat(path, dev_number);
-	strcat(path, "/device");
+
+	sprintf(path, "/root/heartbeat/lankhb@lankhb%s/device", dev_number);
 	set_value(g_doc, path, id);
 
 func_exit:
