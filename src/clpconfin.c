@@ -10,8 +10,7 @@
 
 
 int
-init
-(
+init(
 	char *encoding
 )
 {
@@ -34,8 +33,7 @@ init
 
 
 int
-set_value
-(
+set_value(
 	xmlDocPtr	doc,
 	char		*path,
 	char		*value
@@ -62,8 +60,7 @@ set_value
 
 
 xmlNodePtr
-find_child_node
-(
+find_child_node(
 	xmlDocPtr	doc,
 	xmlNodePtr	node,
 	char		*element,
@@ -95,8 +92,7 @@ find_child_node
 
 
 xmlNodePtr
-find_value_node
-(
+find_value_node(
 	xmlDocPtr	doc,
 	xmlNodePtr	node,
 	char		*path, 
@@ -152,8 +148,7 @@ func_exit:
 
 
 xmlNodePtr
-make_child_node
-(
+make_child_node(
 	xmlNodePtr	node,
 	char		*node_name,
 	char		*attr_var
