@@ -318,3 +318,4 @@ my $objnum = $srvnum + ($srvnum * ($hbnum + $diskhbnum + $npnum)) + $grpnum + $r
 $ret = `$clpcreate add objnum $objnum`;
 
 # convert CRLF to LF
+
