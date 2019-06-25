@@ -17,7 +17,7 @@ my $clpcreate = './clpcreate';
 #  0: use default final action (do nothing)
 #  1: ignore timeout
 #  2: initiate BSoD/panic immediately
-my $type = 0;
+my $type = 1;
 #
 # %cluster
 #  encode:
@@ -79,7 +79,7 @@ my $pingnp =
 #  Name
 my $group =
 [
-    ['failover1'],
+    ['failover'],
     []
 ];
 #
@@ -91,7 +91,7 @@ my $resource =
         ['fip', 'fip1', ['ip', '192.168.137.70']],
         ['volmgr', 'volmgr1', ['type', 'lvm'], ['devname', 'ecxsd']],
         ['disk', 'disk1', ['disktype', 'lvm'], ['device', '/dev/ecxsd/sd1'], ['mount/point', '/mnt/sd1'], ['fs', 'ext3']],
-        ['exec', 'exec1'],
+        ['exec', 'exec1', ['act/path', 'start.sh'], ['deact/path', 'stop.sh']],
         []
     ],
     []
@@ -116,7 +116,7 @@ my $monitor =
     ['volmgrw', 'volmgrw1', ['parameters/devname', 'ecxsd'], ['target', 'volmgr1'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
     ['diskw', 'diskw1', ['parameters/object', '/dev/sdc2'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
     ['ipw', 'ipw1', ['parameters/list@0/ip', '192.168.137.1'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
-    ['genw', 'genw1', ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
+    ['genw', 'genw1', ['parameters/path', 'genw.sh'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
     []
 ];
 ##################################################
@@ -181,7 +181,7 @@ for ($i = 0; $i < scalar(@$server); $i++)
 for ($i = 0; $i < scalar(@$pingnp); $i++)
 {
     next if (scalar(@{$pingnp->[$i]}) == 0);
-    for ($j = 4; $j < scalar(@{$pingnp->[$i][$j]}); $j++)
+    for ($j = 4; $j < scalar(@{$pingnp->[$i]}); $j++)
     {
         next if (scalar(@{$pingnp->[$i][$j]}) == 0);
         $ret = `$clpcreate add np ping $pingnp->[$i][0] $pingnp->[$i][1] $pingnp->[$i][2] $pingnp->[$i][3] $pingnp->[$i][$j][0] $pingnp->[$i][$j][1]`;
@@ -231,7 +231,10 @@ for ($i = 0; $i < scalar(@$rscdepend); $i++)
         for ($k = 0; $k < scalar(@{$resource->[$j]}); $k++)
         {
             next if (scalar(@{$resource->[$j][$k]}) == 0);
-            $ret = `$clpcreate add rscdep $resource->[$j][$k][0] $resource->[$j][$k][1] $rscdepend->[$i][0]`;
+            if ($resource->[$j][$k][1] eq $rscdepend->[$i][1])
+            {
+                $ret = `$clpcreate add rscdep $resource->[$j][$k][0] $resource->[$j][$k][1] $rscdepend->[$i][0]`;
+            }
         }
     }
 }
@@ -317,5 +320,10 @@ for ($i = 0; $i < scalar(@$monitor); $i++)
 my $objnum = $srvnum + ($srvnum * ($hbnum + $diskhbnum + $npnum)) + $grpnum + $rscnum + $monnum + 4;
 $ret = `$clpcreate add objnum $objnum`;
 
+$ret = `xmllint --format --output clp.conf clp.conf`
+
 # convert CRLF to LF
 
+# Debug
+#print "objnum is $objnum\n";
+#print "server:$srvnum, hb:$hbnum, diskhb:$diskhbnum, np:$npnum, grp:$grpnum, rsc:$rscnum, mon:$monnum\n"

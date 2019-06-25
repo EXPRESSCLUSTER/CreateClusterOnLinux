@@ -8,6 +8,8 @@
 
 #include "clpcreate.h"
 
+int child_hit_flag;
+
 
 int
 init(
@@ -49,7 +51,7 @@ set_value(
 	root_node = xmlDocGetRootElement(doc);
 	target_node = find_value_node(doc, root_node, path, curr);
 
-	if (value != NULL)
+	if (target_node != NULL && value != NULL)
 	{
 		new_text = xmlNewText(value);
 		xmlAddChild(target_node, new_text);
@@ -99,11 +101,11 @@ find_value_node(
 	char		*curr
 )
 {
-	xmlNodePtr	ret_node;
-	char		element[1024];
-	char		attribute[1024];
-	char		*p;
-	int			ret;
+	xmlNodePtr		ret_node;
+	char			element[1024];
+	char			attribute[1024];
+	char			*p;
+	int				ret;
 
 	strcpy(element, &path[strlen(curr) + 1]);
 	strcpy(attribute, "");
@@ -121,10 +123,16 @@ find_value_node(
 		strcpy(attribute, ++p);
 	}
 
+	child_hit_flag = 0;
 	ret_node = find_child_node(doc, node, element, attribute);
 	if (ret_node == NULL)
 	{
 		ret_node = make_child_node(node, element, attribute);
+		child_hit_flag = 0;
+	}
+	else
+	{
+		child_hit_flag = 1;
 	}
 	/* continue? */
 	strcat(curr, "/");
@@ -143,7 +151,14 @@ find_value_node(
 	
 func_exit:
 
-	return ret_node;
+	if (child_hit_flag == 0)
+	{
+		return ret_node;
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 

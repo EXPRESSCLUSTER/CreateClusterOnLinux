@@ -332,7 +332,7 @@ add_diskhb(
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
 
-	i = atoi(id);
+	i = atoi(id) - 300;
 	i++;
 	sprintf(dev_number, "%d", i);
 	
@@ -653,7 +653,7 @@ add_pingnp(
 
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
-
+	printf("priority is %s, device is %s\n", priority, device);
 	sprintf(path, "/root/networkpartition/types@pingnp");
 	ret = set_value(g_doc, path, "");
 	if (ret)
