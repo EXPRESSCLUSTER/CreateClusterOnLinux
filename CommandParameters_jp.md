@@ -49,7 +49,13 @@ $ clpcreate add srv <サーバ名> <プライオリティ>
   ```
 
 ## IP アドレスの追加
+- FIXME
 
+## ディスクハートビートの追加
+- FIXME
+
+## ネットワークパーティション解決リソースの追加
+- FIXME
 
 ## グループの追加
 ```bash
@@ -211,7 +217,34 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 
 ## リソースのパラメータ
 ### 共通パラメータ
-- 
+#### 復旧動作
+- act/retry: 活性リトライしきい値
+- act/fo: フェイルオーバしきい値
+- act/action: (活性異常検出時の) 最終動作
+- deact/retry: 非活性リトライしきい値
+- act/action: (非活性異常検出時の) 最終動作
+  ```bash
+  $ clpcreate add rscparam fip fip1 act/retry 1
+  $ clpcreate add rscparam fip fip1 act/fo 1
+  $ clpcreate add rscparam fip fip1 act/action 2
+  $ clpcreate add rscparam fip fip1 deact/retry 1
+  $ clpcreate add rscparam fip fip1 deact/retry 5
+  ```
+  |数値|最終動作|備考|
+  |----|---------|--|
+  |   0|何もしない (次のリソースを活性/非活性する)||
+  |   1|何もしない (次のリソースを活性/非活性しない)||
+  |   2|グループ停止|活性異常検出時のみ指定可能|
+  |   3|クラスタサービス停止||
+  |   4|クラスタサービス停止とOSシャットダウン||
+  |   5|クラスタサービス停止とOS再起動||
+  |   8|sysrqパニック||
+  |   9|keepaliveリセット||
+  |  10|keepaliveパニック||
+  |  11|BMCリセット||
+  |  12|BMCパワーオフ||
+  |  13|BMCパワーサイクル||
+  |  14|BMC NMI||
 
 ### ディスクリソース (タイプ名: disk)
 - parameters/disktype: ディスクのタイプ
@@ -224,8 +257,8 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 
 ### exec リソース (タイプ名: exec)
 - parameters/act/path: Start script のパス
-  - この製品で作成したスクリプト (既定値) の場合、**start.sh** を指定してください。
-　- ユーザアプリケーションの場合、任意のパス (e.g. /opt/test/start.sh) を指定してください。
+  - **この製品で作成したスクリプト (既定値)** の場合、**start.sh** を指定してください。
+　- **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/start.sh) を指定してください。
 - parameters/deact/path: Stop script のパス
   - この製品で作成したスクリプト (既定値) の場合、**stop.sh** を指定してください。
 　- ユーザアプリケーションの場合、任意のパス (e.g. /opt/test/stop.sh) を指定してください。
@@ -243,9 +276,114 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 ## モニタリソースのパラメータ
 ### 共通パラメータ
 #### 監視 (共通)
-#### 回復動作
-- 回復対象がグループの場合、以下を設定してください。
-  - relation/type: grp
-  - relation/name: フェイルオーバグループ名
+- polling/interval: 監視処理のインターバル
+- polling/timeout: 監視処理のタイムアウト
+- polling/reconfirmation: リトライ回数
+  ```bash
+  $ clpcreate add monparam fipw fipw1 polling/interval 60
+  $ clpcreate add monparam fipw fipw1 polling/timeout 120
+  $ clpcreate add monparam fipw fipw1 polling/reconfirmation 1
+  ```
+- polling/timing: 監視タイミング
+  - 0: 常時
+  - 1: 活性時
+    - 既定値が常時のモニタリソースにおいて、活性時に変更する場合、target も併せて指定してください。
+- target: 監視対象のリソース
+　- polling/timing が 1 の場合 (活性時監視) 、target を設定する必要があります。
+  - polling/timing が 0 の場合 (常時監視) 、設定は不要です。
+    ```bash
+    $ clpcreate add monparam fipw fipw1 target fip1
+    ```
+- firstmonwait: 監視開始待ち時間
 
-### 
+#### 回復動作
+- 回復対象
+  - リソースの場合
+    ```bash
+    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/type rsc
+    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/name <リソース名>
+    ```
+  - グループの場合
+    ```bash
+    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/type grp
+    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/name <フェイルオーバグループ名>
+    ```
+  - LocalServer の場合
+    ```bash
+    add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/type cls
+    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/name LocalServer
+    ```
+- emergency/threshold/restart: 最大再活性回数
+  ```bash
+  $ clpcreate add monparam genw genw1 emergency/threshold/restart 1
+  ```
+- emergency/threshold/fo: 最大フェイルオーバ回数
+  ```bash
+  $ clpcreate add monparam genw genw1 emergency/threshold/fo 1
+  ```
+- emergency/action: 最終動作
+  ```bash
+  $ clpcreate add monparam genw genw1 emergency/action 3
+  ```
+  |数値|最終動作|
+  |----|---------|
+  |   1|何もしない|
+  |   2|グループ停止|
+  |   3|クラスタサービス停止|
+  |   4|クラスタサービス停止とOSシャットダウン|
+  |   5|クラスタサービス停止とOS再起動|
+  |   8|sysrqパニック|
+  |   9|keepaliveリセット|
+  |  10|keepaliveパニック|
+  |  11|BMCリセット|
+  |  12|BMCパワーオフ|
+  |  13|BMCパワーサイクル|
+  |  14|BMC NMI|
+
+
+### フローティング IP モニタリソース (タイプ名: fipw)
+- parameters/monmii: NIC Link Up/Downを監視する
+  - 0: 監視しない (既定値)
+  - 1: 監視する
+    ```bash
+    $ clpcreate add monparam genw genw1 parameters/monmii 1
+    ```
+
+### カスタムモニタリソース (タイプ名: genw)
+- parameters/path
+  - **この製品で作成したスクリプト** の場合、genw.sh を指定してください。
+  - **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/genw.sh) を指定してください。
+    ```bash
+    $ clpcreate add monparam genw genw1 parameters/path genw.sh
+    ```
+
+### IP モニタリソース (タイプ名: ipw)
+- parameters/list@<id>/ip
+  - 監視対象の IP アドレスが1つの場合、以下のように実行してください。
+    ```bash
+    $ clpcreate add monparam ipw ipw1 parameters/list@0/ip <ゲートウェイ の IP アドレス>
+    ```
+  - 複数の IP アドレスを監視対象とする場合、以下のように実行してください。
+    ```bash
+    $ clpcreate add monparam ipw ipw1 parameters/list@0/ip <ゲートウェイ#1 の IP アドレス>
+    $ clpcreate add monparam ipw ipw1 parameters/list@1/ip <ゲートウェイ#2 の IP アドレス>
+    ```
+
+### ユーザ空間モニタリソース (タイプ名: userw)
+- parameters/method: 監視方法
+  - keepalive: X 4.x 以降の既定値
+  - softdog: X 3.x までの既定値
+    ```bash
+    $ clpcreate add monparam userw userw1 parameters/method keepalive
+    ```
+- parameters/action: タイムアウト発生時動作
+  - RESET
+  - PANIC (softdog の場合は既定値かつ固定値のためコマンドでは指定不要)
+    ```bash
+    $ clpcreate add monparam userw userw1 parameters/action PANIC
+    ```
+### ボリュームマネージャモニタリソース (タイプ名: volmgrw)
+- parameters/devname: VG 名を指定してください。
+  ```bash
+  $ clpcreate add monparam volmgrw volmgrw parameters/devname <VG 名>
+  ```
