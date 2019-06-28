@@ -76,14 +76,15 @@ $ clpcreate add <グループのタイプ> <グループ名>
 ## リソースの追加
 ```bash
 # リソースの追加
-$ clpcreate add rsc <リソースを追加するグループ名> <リソースタイプ> <リソース名>
+$ clpcreate add rsc <リソースを追加するグループ名> <リソースのタイプ名> <リソース名>
 
 # リソースのパラメータの追加
-$ clpcreate add rscparam
+$ clpcreate add rscparam <リソースのタイプ名> <リソース名> <タグ名> <パラメータ>
 ```
 - リソースを追加するグループ名: リソースを追加したいグループ名を指定してください。
-- リソースタイプ: リソースのタイプ (e.g. fip, disk, exec) を指定してください。
+- リソースのタイプ名: リソースのタイプ (e.g. fip, disk, exec) を指定してください。
 - リソース名: リソース名を指定してください。
+- タグ名、パラメータについては、[リソースのパラメータ](#リソースのパラメータ)を参照してください。
 - サンプルスクリプトでは、以下のように設定しています。
   ```perl
   my $resource =
@@ -114,15 +115,108 @@ $ clpcreate add rscparam
   }
   ```
 
-## リソースの依存関係
+## リソースの依存関係を設定する
+```bash
+$ clpcreate add rscdep <依存されるリソース名> <依存するリソース名>
+```
+- グループの起動時、依存されるリソースの起動後、依存するリソースを起動します。
+- グループの停止時、依存するリソースの起動後、依存されるリソースを停止します。
+- サンプルスクリプトでは、以下のように設定しています。
+  ```perl
+  my $rscdepend =
+  [
+      ['volmgr1', 'disk1'],
+      []
+  ];
+   :
+  # add a resource dependence
+  for ($i = 0; $i < scalar(@$rscdepend); $i++)
+  {
+      next if (scalar(@{$rscdepend->[$i]}) == 0);
+      for ($j = 0; $j < scalar(@$resource); $j++)
+      {
+          next if (scalar(@{$resource->[$j]}) == 0);
+          for ($k = 0; $k < scalar(@{$resource->[$j]}); $k++)
+          {
+              next if (scalar(@{$resource->[$j][$k]}) == 0);
+              if ($resource->[$j][$k][1] eq $rscdepend->[$i][1])
+              {
+                  $ret = `$clpcreate add rscdep $resource->[$j][$k][0] $resource->[$j][$k][1] $rscdepend->[$i][0]`;
+              }
+          }
+      }
+  }
+  ```
+
+## モニタリソースを追加する
+```bash
+# モニタリソースを追加する
+$ clpcreate add mon <モニタリソースのタイプ名> <モニタリソース名>
+
+# モニタリソースのパラメータを追加する
+$ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> <タグ名> <パラメータ>
+```
+- モニタリソースのタイプ名: モニタリソースのタイプ名 (e.g. diskw, fipw, pidw) を指定してください。
+- タグ名、パラメータについては、[モニタリソースのパラメータ](#モニタリソースのパラメータ)を参照してください。
+- サンプルスクリプトでは、以下のように設定しています。
+  ```perl
+  my $monitor =
+  [
+      ['userw', 'userw', ['parameters/method', 'keepalive']],
+      ['fipw', 'fipw1', ['parameters/monmii', '1'], ['target', 'fip'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
+      ['volmgrw', 'volmgrw1', ['parameters/devname', 'ecxsd'], ['target', 'volmgr1'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
+      ['diskw', 'diskw1', ['parameters/object', '/dev/sdc2'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
+      ['ipw', 'ipw1', ['parameters/list@0/ip', '192.168.137.1'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
+      ['genw', 'genw1', ['parameters/path', 'genw.sh'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
+      []
+  ];
+   : 
+  # add a monitor resource to a cluster
+  for ($i = 0; $i < scalar(@$monitor); $i++)
+  {
+      next if (scalar(@{$monitor->[$i]}) == 0);
+      $ret = `$clpcreate add mon $monitor->[$i][0] $monitor->[$i][1]`;
+      for ($j = 2; $j < scalar(@{$monitor->[$i]}); $j++)
+      {
+          $ret = `$clpcreate add monparam $monitor->[$i][0] $monitor->[$i][1] $monitor->[$i][$j][0] $monitor->[$i][$j][1]`;
+      }
+      if ($monitor->[$i][0] eq 'userw')
+      {
+          $ret = `$clpcreate add monparam $monitor->[$i][0] $monitor->[$i][1] relation/type cls`;
+          $ret = `$clpcreate add monparam $monitor->[$i][0]   $monitor->[$i][1] relation/name LocalServer`;
+      }
+      else
+      {
+          if ($type == 0)
+          {
+              # do nothing
+              $ret = 0;
+          }
+          elsif ($type == 1)
+          {
+              $ret = `$clpcreate add monparam $monitor->[$i][0] $monitor->[$i][1] emergency/threshold/restart 0`;
+              $ret = `$clpcreate add monparam $monitor->[$i][0] $monitor->[$i][1] emergency/timeout/notreconfirmation/use 1`;
+              $ret = `$clpcreate add monparam $monitor->[$i][0] $monitor->[$i][1] emergency/timeout/notrecovery/use   1`;
+          }
+          elsif ($type == 2)
+          {
+              # set keepalive panic (10)
+              $ret = `$clpcreate add monparam $monitor->[$i][0] $monitor->[$i][1] relation/type cls`;
+              $ret = `$clpcreate add monparam $monitor->[$i][0] $monitor->[$i][1] relation/name LocalServer`;
+              $ret = `$clpcreate add monparam $monitor->[$i][0]   $monitor->[$i][1] emergency/action 10`;
+          }
+      }
+  }
+  ```
 
 ## リソースのパラメータ
 ### 共通パラメータ
+- 
 
 ### ディスクリソース (タイプ名: disk)
 - parameters/disktype: ディスクのタイプ
-  - disk: 通常のデバイスをマウントする場合
-  - lvm: ボリュームグループ (VG) 上の論理ボリューム (LV) をマウントする場合 
+  - 通常のデバイスをマウントする場合 **disk** を指定してください。
+  - ボリュームグループ (VG) 上の論理ボリューム (LV) をマウントする場合、**lvm** を指定してください。
 - parameters/device: デバイス名
 - parameters/mount/point: マウントポイント
 - parameters/fs: ファイルシステム
@@ -130,15 +224,28 @@ $ clpcreate add rscparam
 
 ### exec リソース (タイプ名: exec)
 - parameters/act/path: Start script のパス
-  - この製品で作成したスクリプト (既定値) の場合、*start.sh* を指定してください。
+  - この製品で作成したスクリプト (既定値) の場合、**start.sh** を指定してください。
 　- ユーザアプリケーションの場合、任意のパス (e.g. /opt/test/start.sh) を指定してください。
 - parameters/deact/path: Stop script のパス
-  - この製品で作成したスクリプト (既定値) の場合、*stop.sh* を指定してください。
+  - この製品で作成したスクリプト (既定値) の場合、**stop.sh** を指定してください。
 　- ユーザアプリケーションの場合、任意のパス (e.g. /opt/test/stop.sh) を指定してください。
 
 ### フローティング IP リソース (タイプ名: fip)
-- ['ip', '192.168.137.70']],
+- parameters/ip: フローティング IP アドレス
+  - インタコネクトと同じサブネットの IP アドレスを指定してください。
 
 ### ボリュームマネージャリソース (タイプ名: volmgr)
+- parameters/type
+  - LVM を使う場合 **lvm** を指定してください。
+- parameters/devname
+  - LVM を使う場合、VG 名を指定してください。
 
 ## モニタリソースのパラメータ
+### 共通パラメータ
+#### 監視 (共通)
+#### 回復動作
+- 回復対象がグループの場合、以下を設定してください。
+  - relation/type: grp
+  - relation/name: フェイルオーバグループ名
+
+### 
