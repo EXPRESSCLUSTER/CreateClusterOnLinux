@@ -89,9 +89,9 @@ my $resource =
 [
     [
         ['fip', 'fip1', ['ip', '192.168.137.70']],
-        ['volmgr', 'volmgr1', ['type', 'lvm'], ['devname', 'ecxsd']],
-        ['disk', 'disk1', ['disktype', 'lvm'], ['device', '/dev/ecxsd/sd1'], ['mount/point', '/mnt/sd1'], ['fs', 'ext3']],
-        ['exec', 'exec1', ['act/path', 'start.sh'], ['deact/path', 'stop.sh']],
+        ['volmgr', 'volmgr1', ['parameters/type', 'lvm'], ['parameters/devname', 'ecxsd']],
+        ['disk', 'disk1', ['parameters/disktype', 'lvm'], ['parameters/device', '/dev/ecxsd/sd1'], ['parameters/mount/point', '/mnt/sd1'], ['parameters/fs', 'ext3']],
+        ['exec', 'exec1', ['parameters/act/path', 'start.sh'], ['parameters/deact/path', 'stop.sh']],
         []
     ],
     []

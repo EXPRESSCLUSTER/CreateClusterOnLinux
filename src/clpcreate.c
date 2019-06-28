@@ -529,7 +529,10 @@ add_rsc_param(
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
 
+#if 0
 	sprintf(path, "/root/resource/%s@%s/parameters/%s", rsctype, rscname, tag);
+#endif
+	sprintf(path, "/root/resource/%s@%s/%s", rsctype, rscname, tag);
 	ret = set_value(g_doc, path, param);
 	if (ret)
 	{
