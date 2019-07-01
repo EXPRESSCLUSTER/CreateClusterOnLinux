@@ -7,6 +7,7 @@
 - [クラスタの追加](#クラスタの追加)
 - [サーバの追加](#サーバの追加)
 - [IPアドレスの追加](#IPアドレスの追加)
+- [ハートビートの追加](#ハートビートの追加)
 - [ディスクハートビートの追加](#ディスクハートビートの追加)
 - [ネットワークパーティション解決リソースの追加](#ネットワークパーティション解決リソースの追加)
 - [グループの追加](#グループの追加)
@@ -63,13 +64,150 @@ $ clpcreate add srv <サーバ名> <プライオリティ>
   ```
 
 ## IPアドレスの追加
-- FIXME
+```bash
+$ clpcreate add ip <サーバ名> <デバイスID> <IPアドレス>
+```
+- サーバ名: クラスタのサーバ名を指定してください (e.g. hostname コマンドの実行結果)。
+- デバイスID: 各サーバのIPアドレスのデバイスIDを 0 から指定してください。以降のデバイスIDは 1 ずつインクリメントしてください。デバイスIDはサーバ毎で独立となっています。(デバイスID 0 が複数存在することになる。)
+- IPアドレス: CLUSTERPROで用いるIPアドレスを指定してください。
+- サンプルスクリプトでは、以下のように設定しています。
+  ```perl
+  # $ip
+  #  Set IP addresses for the servers.
+  #  On this case, upper IP addresses for server1 and bottom IP addresses for server2.
+  my $ip =
+  [
+      ['192.168.137.71', '192.168.138.71', '192.168.139.71', '192.168.140.71'],
+      ['192.168.137.72', '192.168.138.72', '192.168.139.72', '192.168.140.72'],
+      []
+  ];
+   :
+  # add an IP address to a server
+  for ($i = 0; $i < scalar(@$server); $i++)
+  {
+      next if (scalar(@{$server->[$i]}) == 0);
+      for ($j = 0; $j < scalar(@{$ip->[$i]}); $j++)
+      {
+          $ret = `$clpcreate add ip $server->[$i][0] $j $ip->[$i][$j]`;
+      }
+  }
+  ```
+
+## ハートビートの追加
+```bash
+$ clpcreate add hb <デバイスID> <プライオリティ>
+```
+- デバイスID: IPアドレスのデバイスIDを指定してください。
+- プライオリティ: ハートビートのプライオリティは 0 から指定してください。
+- サンプルスクリプトでは、以下のように設定しています。
+  ```perl
+  # $hb
+  #  Left : Device ID to be used for heartbeat on primary and secondary server
+  #  Right: Priority of the heartbeat
+  my $hb =
+  [
+      ['0', '0'],
+      ['1', '1'],
+      ['2', '2'],
+      ['3', '3'],
+      []
+  ];
+   :
+  # add a heartbeat interface to a cluster
+  for ($i = 0; $i < scalar(@$hb); $i++)
+  {
+      next if (scalar(@{$hb->[$i]}) == 0);
+      $ret = `$clpcreate add hb $hb->[$i][0] $hb->[$i][1]`;
+  }
+  ```
 
 ## ディスクハートビートの追加
-- FIXME
+```bash
+$ clpcreate add diskhb <デバイスID> <プライオリティ>
+$ clpcreate add diskhbsrv <デバイスID> <ディスクデバイス>
+```
+- ディスクハートビートを追加するには、2つのコマンドを実行する必要があります。
+  - clpcreate add diskhb
+  - clpcreate add diskhbsrv
+- デバイスID: ディスクハートビートのデバイスIDを 300 から指定してください。以降のデバイスIDは1ずつインクリメントしてください。
+- プライオリティ: ハートビートのプライオリティを指定してください。
+- ディスクデバイス: ディスクハートビートで用いるデバイスのパスを指定してください。
+- サンプルスクリプトでは、以下のように設定しています。
+  ```perl
+  # $diskhb
+  #  Device ID, Heartbeat priority, Disk path
+  my $diskhb =
+  [
+      ['300', '4', '/dev/sdc1'],
+      []
+  ];
+   :
+  # add a disk heartbeat to a cluster
+  for ($i = 0; $i < scalar(@$diskhb); $i++)
+  {
+      next if (scalar(@{$diskhb->[$i]}) == 0);
+      $ret = `$clpcreate add diskhb $diskhb->[$i][0] $diskhb->[$i][1]`;
+  }
+
+  # add a disk heartbeat to a server
+  for ($i = 0; $i < scalar(@$server); $i++)
+  {
+      next if (scalar(@{$server->[$i]}) == 0);
+      for ($j = 0; $j < scalar(@$diskhb); $j++)
+      {
+          next if (scalar(@{$diskhb->[$j]}) == 0);
+          $ret = `$clpcreate add diskhbsrv $server->[$i][0] $diskhb->[$j][0] $diskhb->[$j][2]`;
+      }
+  }
+  ```
 
 ## ネットワークパーティション解決リソースの追加
-- FIXME
+```bash
+$ clpcreate add np ping <プライオリティ> <デバイスID> <グループID> <リストID> <IPアドレス>
+$ clpcreate add npsrv ping <サーバ名> <デバイスID> <使用の有無>
+```
+- NP解決リソースを追加するには、2つのコマンドを実行する必要があります。
+  - clpcreate add np
+  - clpcreate add npsrv
+- プライオリティ: NP解決リソースのプライオリティは 0 から指定してください。
+- デバイスID: NP解決リソースのデバイスIDを 10200 から指定してください。以降のデバイスは 1 ずつインクリメントしてください。
+- グループID: NP解決リソースのグループIDを 0 から指定してください。以降のグループIDは 1 ずつインクリメントしてください。
+- リストID: IPアドレスのIDを 0 から指定してください。以降のIDは 1 ずつインクリメントしてください。
+- IPアドレス: NP解決リソースで用いるIPアドレスを指定してください。
+- サーバ名: サーバ名を指定してください。
+- 使用の有無: 各サーバについて、使用する場合は 1 、使用しない場合は空文字 "" を指定してください。
+- サンプルスクリプトでは、以下のように設定しています。
+  ```perl
+  # $pingnp
+  #  Name, NP priority, Device ID, Group ID, [List ID, IP address], ...
+  my $pingnp =
+  [
+      ['0', '10200', '0', ['0', '192.168.137.1'], ['1', '192.168.137.76'], []],
+      []
+  ];
+   :
+  # add a network partition resource to a cluster
+  for ($i = 0; $i < scalar(@$pingnp); $i++)
+  {
+      next if (scalar(@{$pingnp->[$i]}) == 0);
+      for ($j = 3; $j < scalar(@{$pingnp->[$i]}); $j++)
+      {
+          next if (scalar(@{$pingnp->[$i][$j]}) == 0);
+          $ret = `$clpcreate add np ping $pingnp->[$i][0] $pingnp->[$i][1] $pingnp->[$i][2] $pingnp->[$i][$j][0] $pingnp->[$i][$j][1]`;
+      }
+  }
+  
+  # add a network partition resource to a server
+  for ($i = 0; $i < scalar(@$server); $i++)
+  {
+      next if (scalar(@{$server->[$i]}) == 0);
+      for ($j = 0; $j < scalar(@$pingnp); $j++)
+      {
+          next if (scalar(@{$pingnp->[$j]}) == 0);
+          $ret = `$clpcreate add npsrv ping $server->[$i][0] $pingnp->[$j][1] 1`;
+      }
+  }
+  ```
 
 ## グループの追加
 ```bash
