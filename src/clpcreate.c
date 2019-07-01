@@ -67,7 +67,7 @@ main(
 			}
 			else if (!strcmp(argv[3], "ping"))
 			{
-				add_pingnp(argv[4], argv[5], argv[6], argv[7], argv[8], argv[9]);
+				add_pingnp(argv[4], argv[5], argv[6], argv[7], argv[8]);
 			}
 			else
 			{
@@ -643,7 +643,6 @@ func_exit:
  */
 int
 add_pingnp(
-	char* npname, 
 	char* priority, 
 	char* device, 
 	char* grpid, 
@@ -652,11 +651,17 @@ add_pingnp(
 )
 {
 	char 	path[CONF_PATH_LEN];
+	char	dev_number[16];
+	int		i;
 	int 	ret;
 
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
-	printf("priority is %s, device is %s\n", priority, device);
+
+	i = atoi(device) - 10200;
+	i++;
+	sprintf(dev_number, "%d", i);
+
 	sprintf(path, "/root/networkpartition/types@pingnp");
 	ret = set_value(g_doc, path, "");
 	if (ret)
@@ -664,21 +669,21 @@ add_pingnp(
 		printf("set_value() failed. (ret: %d)\n", ret);
 		ret = CONF_ERR_FILE;
 	}
-	sprintf(path, "/root/networkpartition/pingnp@%s/priority", npname);
+	sprintf(path, "/root/networkpartition/pingnp@pingnp%s/priority", dev_number);
 	ret = set_value(g_doc, path, priority);
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);
 		ret = CONF_ERR_FILE;
 	}
-	sprintf(path, "/root/networkpartition/pingnp@%s/device", npname);
+	sprintf(path, "/root/networkpartition/pingnp@pingnp%s/device", dev_number);
 	ret = set_value(g_doc, path, device);
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);
 		ret = CONF_ERR_FILE;
 	}
-	sprintf(path, "/root/networkpartition/pingnp@%s/grp@%s/list@%s/ip", npname, grpid, listid);
+	sprintf(path, "/root/networkpartition/pingnp@pingnp%s/grp@%s/list@%s/ip", dev_number, grpid, listid);
 	ret = set_value(g_doc, path, ip);
 	if (ret)
 	{

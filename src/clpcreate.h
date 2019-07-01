@@ -38,7 +38,7 @@ int add_rsc_param(char *rsctype, char *rscname, char *tag, char *param);
 int add_rsc_guid(char *rsctype, char *rscname, char *srvname, char *tag, char *guid);
 int add_mon(char *montype, char *monname);
 int add_mon_param(char *montype, char *monname, char *tag, char *param);
-int add_pingnp(char *npname, char *priority, char *id, char *grpid, char *listid, char *ip); 
+int add_pingnp(char *priority, char *id, char *grpid, char *listid, char *ip); 
 int add_disknp(char *npname, char *priority, char *id); 
 int add_pingnpsrv(char *srvname, char *id, char *grpid); 
 int add_disknpsrv(char *srvname, char *id, char *guid, char *letter); 

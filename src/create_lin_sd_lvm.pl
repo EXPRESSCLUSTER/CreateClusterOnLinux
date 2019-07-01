@@ -48,8 +48,8 @@ my $ip =
 ];
 #
 # $hb
-#  Left : The device ID to be used for heartbeat on primary server
-#  Right: The device ID to be used for heartbeat on secondary server
+#  Device ID to be used for heartbeat on primary server and secondary server
+#  Priority of the heartbeat
 my $hb =
 [
     ['0', '0'],
@@ -71,7 +71,7 @@ my $diskhb =
 #  Name, NP priority, Device ID, Group ID, [List ID, IP address], ...
 my $pingnp =
 [
-    ['pingnp1', '0', '10200', '0', ['0', '192.168.137.1'], ['1', '192.168.137.76'], []],
+    ['0', '10200', '0', ['0', '192.168.137.1'], ['1', '192.168.137.76'], []],
     []
 ];
 #
@@ -181,10 +181,10 @@ for ($i = 0; $i < scalar(@$server); $i++)
 for ($i = 0; $i < scalar(@$pingnp); $i++)
 {
     next if (scalar(@{$pingnp->[$i]}) == 0);
-    for ($j = 4; $j < scalar(@{$pingnp->[$i]}); $j++)
+    for ($j = 3; $j < scalar(@{$pingnp->[$i]}); $j++)
     {
         next if (scalar(@{$pingnp->[$i][$j]}) == 0);
-        $ret = `$clpcreate add np ping $pingnp->[$i][0] $pingnp->[$i][1] $pingnp->[$i][2] $pingnp->[$i][3] $pingnp->[$i][$j][0] $pingnp->[$i][$j][1]`;
+        $ret = `$clpcreate add np ping $pingnp->[$i][0] $pingnp->[$i][1] $pingnp->[$i][2] $pingnp->[$i][$j][0] $pingnp->[$i][$j][1]`;
     }
 }
 
@@ -195,7 +195,7 @@ for ($i = 0; $i < scalar(@$server); $i++)
     for ($j = 0; $j < scalar(@$pingnp); $j++)
     {
         next if (scalar(@{$pingnp->[$j]}) == 0);
-        $ret = `$clpcreate add npsrv ping $server->[$i][0] $pingnp->[$j][2] 1`;
+        $ret = `$clpcreate add npsrv ping $server->[$i][0] $pingnp->[$j][1] 1`;
     }
 }
 
