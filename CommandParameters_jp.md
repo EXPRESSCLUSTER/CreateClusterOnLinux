@@ -560,10 +560,10 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 ### exec リソース (タイプ名: exec)
 - parameters/act/path: Start script のパス
   - **この製品で作成したスクリプト (既定値)** の場合、**start.sh** を指定してください。
-　- **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/start.sh) を指定してください。
+  - **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/start.sh) を指定してください。
 - parameters/deact/path: Stop script のパス
-  - この製品で作成したスクリプト (既定値) の場合、**stop.sh** を指定してください。
-　- ユーザアプリケーションの場合、任意のパス (e.g. /opt/test/stop.sh) を指定してください。
+  - **この製品で作成したスクリプト (既定値)** の場合、**stop.sh** を指定してください。
+  - **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/stop.sh) を指定してください。
 - parameters/timeout/start: 開始スクリプトのタイムアウト
 - parameters/timeout/stop: 終了スクリプトのタイムアウト
 
@@ -678,7 +678,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
     ```
 
 ### IP モニタリソース (タイプ名: ipw)
-- parameters/list@<\id>/ip
+- parameters/list@\<id\>/ip
   - 監視対象の IPアドレスが1つの場合、以下のように実行してください。
     ```bash
     $ clpcreate add monparam ipw ipw1 parameters/list@0/ip <ゲートウェイ の IP アドレス>
