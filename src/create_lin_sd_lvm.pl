@@ -27,7 +27,7 @@ my $type = 1;
 #  os:
 #   windows or linux
 my %cluster = (name=>'cluster', encode=>'EUC-JP', os=>'linux');
-# $cluster
+# $cluster_param
 #  tag, parameter
 my $cluster_param =
 [
