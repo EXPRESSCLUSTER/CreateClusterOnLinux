@@ -14,6 +14,7 @@
 - [リソースの追加](#リソースの追加)
 - [リソースの依存関係の追加](#リソースの依存関係の追加)
 - [モニタリソースの追加](#モニタリソースの追加)
+- [クラスタのパラメータ](#クラスタのパラメータ)
 - [リソースのパラメータ](#リソースのパラメータ)
 - [モニタリソースのパラメータ](#モニタリソースのパラメータ)
 
@@ -25,16 +26,81 @@ $ clpcreate init <エンコードの種類>
 
 ## クラスタの追加
 ```bash
+# クラスタの追加
 $ clpcreate add cls <クラスタ名> <エンコード> <OS の種類>
+
+# クラスタのパラメータの追加
+$ clpcreate add clsparam <タグ名> <パラメータ>
 ```
 - エンコード: クラスタサーバの OS の言語を指定してください。日本語の場合は EUC-JP を指定してください。
 - OS の種類: クラスタサーバの OS の種類を指定してください。
+- タグ名、パラメータについては、[クラスタのパラメータ](#クラスタのパラメータ)を参照してください。
 - サンプルスクリプトでは、以下のように設定しています。
   ```perl
   my %cluster = (name=>'cluster', encode=>'EUC-JP', os=>'linux');
+  my $cluster_param =
+  [
+      ['pm/exec0/recover', '7'],
+      ['pm/exec1/recover', '7'],
+      ['pm/exec2/recover', '7'],
+      ['cluster/rsctimeout/rsctoaction', '0'],
+      ['cluster/networkpartition/npaction', '6'],
+      ['haltp/method', 'keepalive'],
+      ['haltp/action', 'PANIC'],
+      []
+  ];
    : 
   # add a cluster to initial configuration
   $ret = `$clpcreate add cls $cluster{'name'} $cluster{'encode'} $cluster{'os'}`;
+
+  # add a cluster parameter
+  for ($i = 0; $i < scalar(@$cluster_param); $i++)
+  {
+      next if (scalar(@{$cluster_param->[$i]}) == 0);
+      $ret = `$clpcreate add clsparam $cluster_param->[$i][0] $cluster_param->[$i][1]`;
+  }
+  ```
+
+## リソースの追加
+```bash
+# リソースの追加
+$ clpcreate add rsc <リソースを追加するグループ名> <リソースのタイプ名> <リソース名>
+
+# リソースのパラメータの追加
+$ clpcreate add rscparam <リソースのタイプ名> <リソース名> <タグ名> <パラメータ>
+```
+- リソースを追加するグループ名: リソースを追加したいグループ名を指定してください。
+- リソースのタイプ名: リソースのタイプ (e.g. fip, disk, exec) を指定してください。
+- リソース名: リソース名を指定してください。
+- タグ名、パラメータについては、[リソースのパラメータ](#リソースのパラメータ)を参照してください。
+- サンプルスクリプトでは、以下のように設定しています。
+  ```perl
+  my $resource =
+  [
+      [
+          ['fip', 'fip1', ['parameters/ip', '192.168.137.70']],
+          ['volmgr', 'volmgr1', ['parameters/type', 'lvm'], ['parameters/devname', 'ecxsd']],
+          ['disk', 'disk1', ['parameters/disktype', 'lvm'], ['parameters/device', '/dev/ecxsd/sd1'], ['parameters/mount/point', '/mnt/sd1'], ['parameters/fs', 'ext3']],
+         ['exec', 'exec1', ['parameters/act/path', 'start.sh'], ['parameters/deact/path', 'stop.sh']],
+          []
+      ],
+      []
+  ];
+   :
+  # add a resouce to a group
+  for ($i = 0; $i < scalar(@$resource); $i++)
+  {
+      next if (scalar(@{$resource->[$i]}) == 0);
+      for ($j = 0; $j < scalar(@{$resource->[$i]}); $j++)
+      {
+          next if (scalar(@{$resource->[$i]->[$j]}) == 0);
+          $ret = `$clpcreate add rsc $group->[$i][0] $resource->[$i][$j][0] $resource->[$i][$j][1]`;
+          for ($k = 2; $k < scalar(@{$resource->[$i]->[$j]}); $k++)
+          {
+              $ret = `$clpcreate add rscparam $resource->[$i][$j][0] $resource->[$i][$j][1] $resource->[$i][$j][$k][0] $resource->[$i][$j][$k][1]`;
+          }
+      }
+  }
   ```
 
 ## サーバの追加
@@ -68,7 +134,8 @@ $ clpcreate add srv <サーバ名> <プライオリティ>
 $ clpcreate add ip <サーバ名> <デバイスID> <IPアドレス>
 ```
 - サーバ名: クラスタのサーバ名を指定してください (e.g. hostname コマンドの実行結果)。
-- デバイスID: 各サーバのIPアドレスのデバイスIDを 0 から指定してください。以降のデバイスIDは 1 ずつインクリメントしてください。デバイスIDはサーバ毎で独立となっています。(デバイスID 0 が複数存在することになる。)
+- デバイスID: 各サーバのIPアドレスのデバイスIDを 0 から指定してください。以降のデバイスIDは 1 ずつインクリメントしてください。
+  - デバイスIDはサーバ毎で独立となっています。(デバイスID 0 が複数存在することになる。)
 - IPアドレス: CLUSTERPROで用いるIPアドレスを指定してください。
 - サンプルスクリプトでは、以下のように設定しています。
   ```perl
@@ -367,6 +434,83 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   }
   ```
 
+## クラスタのパラメータ
+#### リカバリ
+- pm/exec0/recover: クラスタサービスのプロセス異常時動作
+- pm/exec1/recover
+- pm/exec2/recover
+  - 上記 3 つのパス全てに同じ値を設定してください。
+    ```bash
+    $ clpcreate add clsparam pm/exec0/recover 7
+    $ clpcreate add clsparam pm/exec1/recover 7
+    $ clpcreate add clsparam pm/exec2/recover 7
+    ```
+  |数値|最終動作|備考|
+  |----|---------|--|
+  |   2|OSシャットダウン||
+  |   3|OS再起動||
+  |   5|sysrqパニック||
+  |   6|keepaliveリセット||
+  |   7|keepaliveパニック||
+  |   8|BMCリセット||
+  |   9|BMCパワーオフ||
+  |  10|BMCパワーサイクル||
+  |  11|BMC NMI||
+  |  12|I/O-Fencing(High-End Server Option)||
+
+- cluster/rsctimeout/rsctoaction: グループリソースの活性/非活性ストール発生時動作
+  ```bash
+  $ clpcreate add clsparam cluster/rsctimeout/rsctoaction 0
+  ```
+  |数値|最終動作|備考|
+  |----|---------|--|
+  |規定値|クラスタサービス停止とOSシャットダウン||
+  |   0|何もしない(活性/非活性異常として扱う)||
+  |   3|クラスタサービス停止とOS再起動||
+  |   8|sysrqパニック||
+  |   9|keepaliveリセット||
+  |  10|keepaliveパニック||
+  |  11|BMCリセット||
+  |  12|BMCパワーオフ||
+  |  13|BMCパワーサイクル||
+  |  14|BMC NMI||
+  |  15|I/O-Fencing(High-End Server Option)||
+
+- cluster/networkpartition/npaction: NP発生時動作
+  ```bash
+  $ clpcreate add clsparam cluster/networkpartiton/npaction 6
+  ```
+  |数値|最終動作|備考|
+  |----|---------|--|
+  |規定値|クラスタサービス停止とOSシャットダウン||
+  |   0|何もしない(活性/非活性異常として扱う)||
+  |   1|クラスタサービス停止||
+  |   2|クラスタサービス停止とOSシャットダウン||
+  |   3|クラスタサービス停止とOS再起動||
+  |   4|sysrqパニック||
+  |   5|keepaliveリセット||
+  |   6|keepaliveパニック||
+  |   7|BMCリセット||
+  |   8|BMCパワーオフ||
+  |   9|BMCパワーサイクル||
+  |  10|BMC NMI||
+  |  11|I/O-Fencing(High-End Server Option)||
+
+#### リカバリ
+- haltp/method: 監視方法
+  - softdog
+  - keepalive
+    ```bash
+    $ clpcreate add clsparam haltp/method keepalive
+    ```
+    
+- haltp/action: タイムアウト発生時動作
+  - RESET
+  - PANIC (softdog の場合は既定値かつ固定値のためコマンドでは指定不要)
+    ```bash
+    $ clpcreate add clsparam haltp/action PANIC
+    ```
+
 ## リソースのパラメータ
 ### 共通パラメータ
 #### 復旧動作
@@ -374,13 +518,13 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 - act/fo: フェイルオーバしきい値
 - act/action: (活性異常検出時の) 最終動作
 - deact/retry: 非活性リトライしきい値
-- act/action: (非活性異常検出時の) 最終動作
+- deact/action: (非活性異常検出時の) 最終動作
   ```bash
   $ clpcreate add rscparam fip fip1 act/retry 1
   $ clpcreate add rscparam fip fip1 act/fo 1
   $ clpcreate add rscparam fip fip1 act/action 2
   $ clpcreate add rscparam fip fip1 deact/retry 1
-  $ clpcreate add rscparam fip fip1 deact/retry 5
+  $ clpcreate add rscparam fip fip1 deact/action 5
   ```
   |数値|最終動作|備考|
   |----|---------|--|
@@ -406,6 +550,12 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 - parameters/mount/point: マウントポイント
 - parameters/fs: ファイルシステム
   - ext3, ext4, xfs を指定してください
+- parameters/fsck/timing: Mount実行前のfsckアクション
+  - 0: 実行しない
+  - 1: 必ず実行する
+  - 2: 指定回数に達したら実行する
+- parameters/fsck/interval: Mount実行前のfsckアクションを実行するまでのMount回数
+  - parameters/fsck/timing を 2 に設定した場合にのみ設定してください。
 
 ### exec リソース (タイプ名: exec)
 - parameters/act/path: Start script のパス
@@ -414,6 +564,8 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 - parameters/deact/path: Stop script のパス
   - この製品で作成したスクリプト (既定値) の場合、**stop.sh** を指定してください。
 　- ユーザアプリケーションの場合、任意のパス (e.g. /opt/test/stop.sh) を指定してください。
+- parameters/timeout/start: 開始スクリプトのタイムアウト
+- parameters/timeout/stop: 終了スクリプトのタイムアウト
 
 ### フローティング IP リソース (タイプ名: fip)
 - parameters/ip: フローティング IP アドレス
@@ -430,6 +582,16 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 #### 監視 (共通)
 - polling/interval: 監視処理のインターバル
 - polling/timeout: 監視処理のタイムアウト
+- emergency/dumpcollect/use: タイムアウト発生時に監視プロセスのダンプを採取する
+  - usew, genwでは設定できないことにご注意ください。
+  - 0: 無効
+  - 1: 有効
+- emergency/timeout/notreconfirmation/use: タイムアウト発生時にリトライしない
+  - 0: 無効
+  - 1: 有効
+- emergency/timeout/notrecovery/use: タイムアウト発生時に回復動作を実行しない
+  - 0: 無効
+  - 1: 有効
 - polling/reconfirmation: リトライ回数
   ```bash
   $ clpcreate add monparam fipw fipw1 polling/interval 60
@@ -473,6 +635,12 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   ```bash
   $ clpcreate add monparam genw genw1 emergency/threshold/fo 1
   ```
+- emergency/dumpcollect/use: タイムアウト発生時に監視プロセスのダンプを採取するか
+  - 0: 無効 (規定値)
+  - 1: 有効
+    ```bash
+    $ clpcreate add monparam genw genw1 emergency/dumpcollect/use 1
+    ```
 - emergency/action: 最終動作
   ```bash
   $ clpcreate add monparam genw genw1 emergency/action 3
@@ -510,8 +678,8 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
     ```
 
 ### IP モニタリソース (タイプ名: ipw)
-- parameters/list@<id>/ip
-  - 監視対象の IP アドレスが1つの場合、以下のように実行してください。
+- parameters/list@<\id>/ip
+  - 監視対象の IPアドレスが1つの場合、以下のように実行してください。
     ```bash
     $ clpcreate add monparam ipw ipw1 parameters/list@0/ip <ゲートウェイ の IP アドレス>
     ```
