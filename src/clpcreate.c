@@ -117,6 +117,10 @@ main(
 		{
 			add_mon_param(argv[3], argv[4], argv[5], argv[6]);
 		}
+		else if (!strcmp(argv[2], "clsparam"))
+		{
+			add_cls_param(argv[3], argv[4]);
+		}
 		else if (!strcmp(argv[2], "objnum"))
 		{
 			add_obj_num(argv[3]);
@@ -806,7 +810,28 @@ func_exit:
 	return ret;
 }
 
-
+int
+add_cls_param
+(
+	char *tag,
+	char *param
+)
+{
+	char 	path[CONF_PATH_LEN];
+	int		ret;
+	
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+	sprintf(path, "/root/%s", tag);
+	ret = set_value(g_doc, path, param);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+func_exit:
+	return ret;
+}
 
 int
 add_obj_num(

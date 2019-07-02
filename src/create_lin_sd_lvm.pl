@@ -27,6 +27,19 @@ my $type = 1;
 #  os:
 #   windows or linux
 my %cluster = (name=>'cluster', encode=>'EUC-JP', os=>'linux');
+# $cluster
+#  tag, parameter
+my $cluster_param =
+[
+    ['pm/exec0/recover', '7'],
+    ['pm/exec1/recover', '7'],
+    ['pm/exec2/recover', '7'],
+    ['cluster/rsctimeout/rsctoaction', '0'],
+    ['cluster/networkpartition/npaction', '6'],
+    ['haltp/method', 'keepalive'],
+    ['haltp/action', 'PANIC'],
+    []
+];
 #
 # $server
 #  Top of the list is master node.
@@ -48,8 +61,8 @@ my $ip =
 ];
 #
 # $hb
-#  Device ID to be used for heartbeat on primary server and secondary server
-#  Priority of the heartbeat
+#  Left: Device ID to be used for heartbeat on primary server and secondary server
+#  Right: Priority of the heartbeat
 my $hb =
 [
     ['0', '0'],
@@ -134,6 +147,13 @@ $ret = `$clpcreate init $cluster{'encode'}`;
 
 # add a cluster to initial configuration
 $ret = `$clpcreate add cls $cluster{'name'} $cluster{'encode'} $cluster{'os'}`;
+
+# add a cluster parameter
+for ($i = 0; $i < scalar(@$cluster_param); $i++)
+{
+    next if (scalar(@{$cluster_param->[$i]}) == 0);
+    $ret = `$clpcreate add clsparam $cluster_param->[$i][0] $cluster_param->[$i][1]`;
+}
 
 # add a server to a cluster
 for ($i = 0; $i < scalar(@$server); $i++)
