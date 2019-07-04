@@ -464,7 +464,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   ```
   |数値|最終動作|備考|
   |----|---------|--|
-  |規定値|クラスタサービス停止とOSシャットダウン||
+  |既定値|クラスタサービス停止とOSシャットダウン||
   |   0|何もしない(活性/非活性異常として扱う)||
   |   3|クラスタサービス停止とOS再起動||
   |   8|sysrqパニック||
@@ -482,7 +482,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   ```
   |数値|最終動作|備考|
   |----|---------|--|
-  |規定値|クラスタサービス停止とOSシャットダウン||
+  |既定値|クラスタサービス停止とOSシャットダウン||
   |   0|何もしない(活性/非活性異常として扱う)||
   |   1|クラスタサービス停止||
   |   2|クラスタサービス停止とOSシャットダウン||
@@ -636,7 +636,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   $ clpcreate add monparam genw genw1 emergency/threshold/fo 1
   ```
 - emergency/dumpcollect/use: タイムアウト発生時に監視プロセスのダンプを採取するか
-  - 0: 無効 (規定値)
+  - 0: 無効 (既定値)
   - 1: 有効
     ```bash
     $ clpcreate add monparam genw genw1 emergency/dumpcollect/use 1
