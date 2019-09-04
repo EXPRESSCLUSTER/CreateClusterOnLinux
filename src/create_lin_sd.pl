@@ -45,8 +45,8 @@ my $cluster_param =
 #  Top of the list is master node.
 my $server =
 [
-    ['server1'],
-    ['server2'],
+    ['rhel76-217'],
+    ['rhel76-218'],
     []
 ];
 # 
@@ -55,8 +55,8 @@ my $server =
 #  On this case, upper IP addresses for server1 and bottom IP addresses for server2.
 my $ip =
 [
-    ['192.168.137.71', '192.168.138.71', '192.168.139.71', '192.168.140.71'],
-    ['192.168.137.72', '192.168.138.72', '192.168.139.72', '192.168.140.72'],
+    ['192.168.0.217', '192.168.1.217'],
+    ['192.168.0.218', '192.168.1.218'],
     []
 ];
 #
@@ -67,8 +67,6 @@ my $hb =
 [
     ['0', '0'],
     ['1', '1'],
-    ['2', '2'],
-    ['3', '3'],
     []
 ];
 # 
@@ -76,7 +74,7 @@ my $hb =
 #  Device ID, Heartbeat priority, Disk path
 my $diskhb =
 [
-    ['300', '4', '/dev/sdc1'],
+    ['300', '2', '/dev/sdc1'],
     []
 ];
 #
@@ -84,7 +82,7 @@ my $diskhb =
 #  Name, NP priority, Device ID, Group ID, [List ID, IP address], ...
 my $pingnp =
 [
-    ['0', '10200', '0', ['0', '192.168.137.1'], ['1', '192.168.137.76'], []],
+    ['0', '10200', '0', ['0', '192.168.1.144'], []],
     []
 ];
 #
@@ -101,9 +99,8 @@ my $group =
 my $resource =
 [
     [
-        ['fip', 'fip1', ['parameters/ip', '192.168.137.70']],
-        ['volmgr', 'volmgr1', ['parameters/type', 'lvm'], ['parameters/devname', 'ecxsd']],
-        ['disk', 'disk1', ['parameters/disktype', 'lvm'], ['parameters/device', '/dev/ecxsd/sd1'], ['parameters/mount/point', '/mnt/sd1'], ['parameters/fs', 'ext3']],
+        ['fip', 'fip1', ['parameters/ip', '192.168.1.219']],
+        ['disk', 'disk1', ['parameters/disktype', 'disk'], ['parameters/device', '/dev/sdc2'], ['parameters/mount/point', '/mnt/sd1'], ['parameters/fs', 'xfs']],
         ['exec', 'exec1', ['parameters/act/path', 'start.sh'], ['parameters/deact/path', 'stop.sh']],
         []
     ],
@@ -116,7 +113,6 @@ my $resource =
 #    1st resource stops after 2nd resource finishes stopping.
 my $rscdepend =
 [
-    ['volmgr1', 'disk1'],
     []
 ];
 #
@@ -126,10 +122,8 @@ my $monitor =
 [
     ['userw', 'userw', ['parameters/method', 'keepalive']],
     ['fipw', 'fipw1', ['parameters/monmii', '1'], ['target', 'fip'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
-    ['volmgrw', 'volmgrw1', ['parameters/devname', 'ecxsd'], ['target', 'volmgr1'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
     ['diskw', 'diskw1', ['parameters/object', '/dev/sdc2'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
-    ['ipw', 'ipw1', ['parameters/list@0/ip', '192.168.137.1'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
-    ['genw', 'genw1', ['parameters/path', 'genw.sh'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
+    ['ipw', 'ipw1', ['parameters/list@0/ip', '192.168.1.144'], ['relation/type', 'grp'], ['relation/name', $group->[0][0]]],
     []
 ];
 ##################################################
