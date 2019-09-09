@@ -723,7 +723,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 
 ### ディスクモニタリソース (タイプ名: diskw)
 - parameters/object
- - 監視先のディスクのパスを指定してください。
+  - 監視先のディスクのパスを指定してください。
     ```bash
     $ clpcreate add monparam diskw diskw1 parameters/object /dev/sdc2
     ```
