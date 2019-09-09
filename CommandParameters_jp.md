@@ -566,6 +566,12 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   - **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/stop.sh) を指定してください。
 - parameters/timeout/start: 開始スクリプトのタイムアウト
 - parameters/timeout/stop: 終了スクリプトのタイムアウト
+- parameters/act/sync: 開始スクリプトの同期/非同期
+  - 0: 非同期
+  - 1: 同期
+- parameters/deact/sync: 終了スクリプトの同期/非同期
+  - 0: 非同期
+  - 1: 同期
 
 ### フローティング IP リソース (タイプ名: fip)
 - parameters/ip: フローティング IP アドレス
@@ -611,6 +617,31 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 - firstmonwait: 監視開始待ち時間
 
 #### 回復動作
+- カスタム設定のみ対応しています。
+- 適切なパラメータを設定することで、テンプレート(「回復対象を再起動」等)の動作と同様の回復動作を設定することができます。
+  - 回復対象に対してフェイルオーバ実行
+    ```bash
+    $ clpcreate add monparam genw genw1 emergency/threshold/restart 0
+    $ clpcreate add monparam genw genw1 emergency/threshold/fo 1
+    ```
+  - 回復対象を再起動、効果がなければフェイルオーバ実行
+    ```bash
+    $ clpcreate add monparam genw genw1 emergency/threshold/restart 1
+    $ clpcreate add monparam genw genw1 emergency/threshold/fo 1
+    ```
+  - 回復対象を再起動
+    ```bash
+    $ clpcreate add monparam genw genw1 emergency/threshold/restart 1
+    $ clpcreate add monparam genw genw1 emergency/threshold/fo 0
+    ```
+  - 最終動作のみ実行
+    ```bash
+    $ clpcreate add monparam genw genw1 emergency/threshold/restart 0
+    $ clpcreate add monparam genw genw1 emergency/threshold/fo 0
+    ```
+  - カスタム設定
+    - 以降に記載するパラメータから必要なものを設定してください。
+- パラメータの詳細
 - 回復対象
   - リソースの場合
     ```bash
@@ -627,20 +658,24 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
     add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/type cls
     $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/name LocalServer
     ```
+- emergency/threshold/script: 回復スクリプト実行回数
+- emergency/preaction/userestart: 再活性前にスクリプトを実行する
+  - 0: 実行しない
+  - 1: 実行する
 - emergency/threshold/restart: 最大再活性回数
   ```bash
   $ clpcreate add monparam genw genw1 emergency/threshold/restart 1
   ```
+- emergency/preaction/usefailover: フェイルオーバ実行前にスクリプトを実行する
+  - 0: 実行しない
+  - 1: 実行する
 - emergency/threshold/fo: 最大フェイルオーバ回数
   ```bash
   $ clpcreate add monparam genw genw1 emergency/threshold/fo 1
   ```
-- emergency/dumpcollect/use: タイムアウト発生時に監視プロセスのダンプを採取するか
-  - 0: 無効 (既定値)
-  - 1: 有効
-    ```bash
-    $ clpcreate add monparam genw genw1 emergency/dumpcollect/use 1
-    ```
+- emergency/preaction/usefailover: 最終動作前にスクリプトを実行する
+  - 0: 実行しない
+  - 1: 実行する
 - emergency/action: 最終動作
   ```bash
   $ clpcreate add monparam genw genw1 emergency/action 3
@@ -660,6 +695,15 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   |  13|BMCパワーサイクル|
   |  14|BMC NMI|
 
+- スクリプト設定
+  - emergency/preaction/default: スクリプトのタイプ
+    - 0: ユーザアプリケーション
+    - 1: この製品で作成したスクリプト
+  - emergency/preaction/path: ファイル
+    - ユーザアプリケーションの場合: スクリプトの絶対パス
+    - この製品で作成したスクリプトの場合: preaction.sh
+  - emergency/preaction/timeout: タイムアウト
+
 
 ### フローティング IP モニタリソース (タイプ名: fipw)
 - parameters/monmii: NIC Link Up/Downを監視する
@@ -675,6 +719,13 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   - **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/genw.sh) を指定してください。
     ```bash
     $ clpcreate add monparam genw genw1 parameters/path genw.sh
+    ```
+
+### ディスクモニタリソース (タイプ名: diskw)
+- parameters/object
+ - 監視先のディスクのパスを指定してください。
+    ```bash
+    $ clpcreate add monparam diskw diskw1 parameters/object /dev/sdc2
     ```
 
 ### IP モニタリソース (タイプ名: ipw)
@@ -707,3 +758,6 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   ```bash
   $ clpcreate add monparam volmgrw volmgrw parameters/devname <VG 名>
   ```
+
+### PIDモニタリソース (タイプ名: pidw)
+- 固有のパラメータはありません。
