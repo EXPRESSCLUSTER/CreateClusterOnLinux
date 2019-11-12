@@ -19,10 +19,15 @@ main(
 	xmlNodePtr	root_node = NULL;
 	xmlNodePtr	new_node = NULL;
 	int			ret;
+	char		obj_num[16];
 
 	if (!strcmp(argv[1], "init"))
 	{
 		init(argv[2]);
+	}
+	else if (strcmp(argv[1], "add") & strcmp(argv[1], "rpl") & strcmp(argv[1], "rmv"))
+	{
+		printf("invalid parameter (argv[1]: %s) \n", argv[1]);
 		goto func_exit;
 	}
 
@@ -121,18 +126,18 @@ main(
 		{
 			add_cls_param(argv[3], argv[4]);
 		}
-		else if (!strcmp(argv[2], "objnum"))
-		{
-			add_obj_num(argv[3]);
-		}
 		else
 		{
 		}
+	} else if (!strcmp(argv[1], "rpl")) {
+
+	} else if (!strcmp(argv[1], "rmv")) {
+
 	}
-	else
-	{
-		printf("invalid parameter (argv[1]: %s) \n", argv[1]);
-	}
+
+	ret = cal_obj_num();
+	sprintf(obj_num, "%d", ret);
+	add_obj_num(obj_num);
 
 	xmlSaveFormatFileEnc("clp.conf", g_doc, g_encoding, 1);
 
@@ -811,8 +816,7 @@ func_exit:
 }
 
 int
-add_cls_param
-(
+add_cls_param(
 	char *tag,
 	char *param
 )
@@ -852,4 +856,173 @@ add_obj_num(
 
 func_exit:
 	return 0;
+}
+
+int
+cal_obj_num()
+{
+	int objnum = 0;
+	int srvnum = 0;
+	int devnum = 0;
+	int grpnum = 0;
+	int rscnum = 0;
+	int monnum = 0;
+
+	/* cluster, server, resource, monitor icon */
+	objnum += 4;
+
+	srvnum = count_server();
+	devnum = count_device();
+	grpnum = count_group();
+	rscnum = count_resource();
+	monnum = count_monitor();
+	objnum += srvnum + devnum + grpnum + rscnum + monnum;
+
+func_exit:
+	return objnum;
+}
+
+int
+rpl_obj_num(
+	char *objnum
+)
+{
+	int ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+func_exit:
+	return 0;
+}
+
+int
+count_server()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	char		element[32];
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	strcpy(element, "server");
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, element))
+		{
+			ret++;
+		}
+	}
+
+	return ret;
+}
+
+int
+count_group()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	char		element[32];
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	strcpy(element, "group");
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, element))
+		{
+			ret++;
+		}
+	}
+
+	return ret;
+}
+
+int
+count_device()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n_child;
+	char		element[32];
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	strcpy(element, "server");
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, element))
+		{
+			for (n_child = n->children; n_child != NULL; n_child = n_child->next)
+			{
+				if (!strcmp(n_child->name, "device"))
+				{
+					ret++;
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
+int
+count_resource()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n_child;
+	char		element[32];
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	strcpy(element, "resource");
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, element))
+		{
+			for (n_child = n->children; n_child != NULL; n_child = n_child->next)
+			{
+				if (strcmp(n_child->name, "types") & strcmp(n_child->name, "text"))
+				{
+					ret++;
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
+int
+count_monitor()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n_child;
+	char		element[32];
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	strcpy(element, "monitor");
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, element))
+		{
+			for (n_child = n->children; n_child != NULL; n_child = n_child->next)
+			{
+				if (strcmp(n_child->name, "types") & strcmp(n_child->name, "text"))
+				{
+					ret++;
+				}
+			}
+		}
+	}
+
+	return ret;
 }

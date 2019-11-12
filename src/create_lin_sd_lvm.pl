@@ -337,8 +337,8 @@ for ($i = 0; $i < scalar(@$monitor); $i++)
     $monnum++ if (scalar(@{$monitor->[$i]}) != 0);
 }
 
-my $objnum = $srvnum + ($srvnum * ($hbnum + $diskhbnum + $npnum)) + $grpnum + $rscnum + $monnum + 4;
-$ret = `$clpcreate add objnum $objnum`;
+#my $objnum = $srvnum + ($srvnum * ($hbnum + $diskhbnum + $npnum)) + $grpnum + $rscnum + $monnum + 4;
+#$ret = `$clpcreate add objnum $objnum`;
 
 $ret = `xmllint --format --output clp.conf clp.conf`
 

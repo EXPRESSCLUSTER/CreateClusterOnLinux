@@ -44,4 +44,11 @@ int add_pingnpsrv(char *srvname, char *id, char *grpid);
 int add_disknpsrv(char *srvname, char *id, char *guid, char *letter);
 int add_cls_param(char *tag, char *param);
 int add_obj_num(char *objnum);
+int cal_obj_num(void);
+int rpl_obj_num(char *objnum);
+int count_server(void);
+int count_group(void);
+int count_device(void);
+int count_resource(void);
+int count_monitor(void);
 #endif

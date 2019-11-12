@@ -151,14 +151,17 @@ find_value_node(
 	
 func_exit:
 
-	if (child_hit_flag == 0)
-	{
-		return ret_node;
+	if (child_hit_flag == 1)
+	{	
+		if (strcmp(path, curr) == 0) {
+			xmlUnlinkNode(ret_node);
+			xmlFreeNode(ret_node);
+			ret_node = make_child_node(node, element, attribute);
+		}
+		child_hit_flag = 0;
 	}
-	else
-	{
-		return NULL;
-	}
+
+	return ret_node;
 }
 
 

@@ -18,4 +18,3 @@ $CLPCREATE add hb 2 2
 $CLPCREATE add hb 3 3
 $CLPCREATE add np ping pingnp1 0 10200 0 192.168.137.1
 $CLPCREATE add np ping pingnp1 0 10200 1 192.168.137.76
-$CLPCREATE add objnum 14
