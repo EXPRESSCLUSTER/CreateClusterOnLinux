@@ -60,10 +60,10 @@ my $ip =
     []
 ];
 #
-# $hb
-#  Left: Device ID to be used for heartbeat on primary server and secondary server
-#  Right: Priority of the heartbeat
-my $hb =
+# $khb
+#  Left: Device ID to be used for kernel heartbeat on primary server and secondary server
+#  Right: Priority of the kernel heartbeat
+my $khb =
 [
     ['0', '0'],
     ['1', '1'],
@@ -172,11 +172,11 @@ for ($i = 0; $i < scalar(@$server); $i++)
     }
 }
 
-# add a heartbeat interface to a cluster
-for ($i = 0; $i < scalar(@$hb); $i++)
+# add a kernel heartbeat interface to a cluster
+for ($i = 0; $i < scalar(@$khb); $i++)
 {
-    next if (scalar(@{$hb->[$i]}) == 0);
-    $ret = `$clpcreate add hb $hb->[$i][0] $hb->[$i][1]`;
+    next if (scalar(@{$khb->[$i]}) == 0);
+    $ret = `$clpcreate add khb $khb->[$i][0] $khb->[$i][1]`;
 }
 
 # add a disk heartbeat to a cluster
@@ -297,45 +297,45 @@ for ($i = 0; $i < scalar(@$monitor); $i++)
 }
 
 # add object number
-my $srvnum = 0;
-for ($i = 0; $i < scalar(@$server); $i++)
-{
-    $srvnum++ if (scalar(@{$server->[$i]}) != 0);
-}
-my $hbnum = 0;
-for ($i = 0; $i < scalar(@$hb); $i++)
-{
-    $hbnum++ if (scalar(@{$hb->[$i]}) != 0);
-}
-my $diskhbnum = 0;
-for ($i = 0; $i < scalar(@$diskhb); $i++)
-{
-    $diskhbnum++ if (scalar(@{$diskhb->[$i]}) != 0);
-}
-my $npnum = 0;
-for ($i = 0; $i < scalar(@$pingnp); $i++)
-{
-    $npnum++ if (scalar(@{$pingnp->[$i]}) != 0);
-}
-my $grpnum = 0;
-for ($i = 0; $i < scalar(@$group); $i++)
-{
-    $grpnum++ if (scalar(@{$group->[$i]}) != 0);
-}
-my $rscnum = 0;
-for ($i = 0; $i < scalar(@$resource); $i++) 
-{
-    next if (scalar(@{$resource->[$i]}) == 0);
-    for ($j = 0; $j < scalar(@{$resource->[$i]}); $j++) 
-    {
-        $rscnum++ if (scalar(@{$resource->[$i][$j]}) != 0);
-    }
-}
-my $monnum = 0;
-for ($i = 0; $i < scalar(@$monitor); $i++)
-{
-    $monnum++ if (scalar(@{$monitor->[$i]}) != 0);
-}
+#my $srvnum = 0;
+#for ($i = 0; $i < scalar(@$server); $i++)
+#{
+#    $srvnum++ if (scalar(@{$server->[$i]}) != 0);
+#}
+#my $hbnum = 0;
+#for ($i = 0; $i < scalar(@$hb); $i++)
+#{
+#    $hbnum++ if (scalar(@{$hb->[$i]}) != 0);
+#}
+#my $diskhbnum = 0;
+#for ($i = 0; $i < scalar(@$diskhb); $i++)
+#{
+#    $diskhbnum++ if (scalar(@{$diskhb->[$i]}) != 0);
+#}
+#my $npnum = 0;
+#for ($i = 0; $i < scalar(@$pingnp); $i++)
+#{
+#    $npnum++ if (scalar(@{$pingnp->[$i]}) != 0);
+#}
+#my $grpnum = 0;
+#for ($i = 0; $i < scalar(@$group); $i++)
+#{
+#    $grpnum++ if (scalar(@{$group->[$i]}) != 0);
+#}
+#my $rscnum = 0;
+#for ($i = 0; $i < scalar(@$resource); $i++) 
+#{
+#    next if (scalar(@{$resource->[$i]}) == 0);
+#    for ($j = 0; $j < scalar(@{$resource->[$i]}); $j++) 
+#    {
+#        $rscnum++ if (scalar(@{$resource->[$i][$j]}) != 0);
+#    }
+#}
+#my $monnum = 0;
+#for ($i = 0; $i < scalar(@$monitor); $i++)
+#{
+#    $monnum++ if (scalar(@{$monitor->[$i]}) != 0);
+#}
 
 #my $objnum = $srvnum + ($srvnum * ($hbnum + $diskhbnum + $npnum)) + $grpnum + $rscnum + $monnum + 4;
 #$ret = `$clpcreate add objnum $objnum`;

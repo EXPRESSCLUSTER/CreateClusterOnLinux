@@ -52,9 +52,17 @@ main(
 		{
 			add_ip(argv[3], argv[4], argv[5]);
 		}
+		else if (!strcmp(argv[2], "khb"))
+		{
+			add_khb(argv[3], argv[4]);
+		}
 		else if (!strcmp(argv[2], "hb"))
 		{
 			add_hb(argv[3], argv[4]);
+		}
+		else if (!strcmp(argv[2], "bmchb"))
+		{
+			add_bmchb(argv[3], argv[4]);
 		}
 		else if (!strcmp(argv[2], "diskhb"))
 		{
@@ -97,6 +105,10 @@ main(
 		else if (!strcmp(argv[2], "grp"))
 		{
 			add_grp(argv[3], argv[4]);
+		}
+		else if (!strcmp(argv[2], "grpparam"))
+		{
+			add_grp_param(argv[3], argv[4], argv[5], argv[6]);
 		}
 		else if (!strcmp(argv[2], "rsc"))
 		{
@@ -257,13 +269,21 @@ add_ip(
 )
 {
 	char 		path[CONF_PATH_LEN];
+	char		type[16];
+	int			i;
 	int			ret;
 
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
+	i = atoi(id);
+	if (i < 600) {
+		strcpy(type, "lan");
+	} else {
+		strcpy(type, "bmc");
+	}
 	
 	sprintf(path, "/root/server@%s/device@%s/type", srvname, id);
-	ret = set_value(g_doc, path, "lan");
+	ret = set_value(g_doc, path, type);
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);
@@ -283,7 +303,7 @@ func_exit:
 
 
 int
-add_hb(
+add_khb(
 	char *id,
 	char *priority
 )
@@ -296,7 +316,7 @@ add_hb(
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
 
-	i = atoi(id);
+	i = count_khb();
 	i++;
 	sprintf(dev_number, "%d", i);
 	
@@ -326,6 +346,94 @@ func_exit:
 	return ret;
 }
 
+
+int
+add_hb(
+	char *id,
+	char *priority
+)
+{
+	char 		path[CONF_PATH_LEN];
+	char		dev_number[16];
+	int			i;
+	int			ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	i = count_hb();
+	i++;
+	sprintf(dev_number, "%d", i);
+	
+	sprintf(path, "/root/heartbeat/types@lanhb");
+	ret = set_value(g_doc, path, "");
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/heartbeat/lanhb@lanhb%s/priority", dev_number);
+	ret = set_value(g_doc, path, priority);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/heartbeat/lanhb@lanhb%s/device", dev_number);
+	ret = set_value(g_doc, path, id);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+
+func_exit:
+	return ret;
+}
+
+int
+add_bmchb(
+	char *id,
+	char *priority
+)
+{
+	char 		path[CONF_PATH_LEN];
+	char		dev_number[16];
+	int			i;
+	int			ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	i = atoi(id) - 600;
+	i++;
+	sprintf(dev_number, "%d", i);
+	
+	sprintf(path, "/root/heartbeat/types@bmchb");
+	ret = set_value(g_doc, path, "");
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/heartbeat/bmchb@bmchb%s/priority", dev_number);
+	ret = set_value(g_doc, path, priority);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/heartbeat/bmchb@bmchb%s/device", dev_number);
+	ret = set_value(g_doc, path, id);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+
+func_exit:
+	return ret;
+}
 
 int
 add_diskhb(
@@ -453,6 +561,30 @@ add_grp(
 		ret = CONF_ERR_FILE;
 	}
 
+func_exit:
+	return ret;
+}
+
+int
+add_grp_param(
+	char *grptype,
+	char *grpname,
+	char *tag,
+	char *param
+)
+{
+	char 	path[CONF_PATH_LEN];
+	int		ret;
+	
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+	sprintf(path, "/root/group@%s/%s", grpname, tag);
+	ret = set_value(g_doc, path, param);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
 func_exit:
 	return ret;
 }
@@ -894,6 +1026,64 @@ rpl_obj_num(
 
 func_exit:
 	return 0;
+}
+
+int
+count_hb()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n_child;
+	char		element[32];
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	strcpy(element, "heartbeat");
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, element))
+		{
+			for (n_child = n->children; n_child != NULL; n_child = n_child->next)
+			{
+				if (!strcmp(n_child->name, "lanhb"))
+				{
+					ret++;
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
+int
+count_khb()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n_child;
+	char		element[32];
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	strcpy(element, "heartbeat");
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, element))
+		{
+			for (n_child = n->children; n_child != NULL; n_child = n_child->next)
+			{
+				if (!strcmp(n_child->name, "lankhb"))
+				{
+					ret++;
+				}
+			}
+		}
+	}
+
+	return ret;
 }
 
 int

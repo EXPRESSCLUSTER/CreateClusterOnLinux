@@ -60,10 +60,10 @@ my $ip =
     []
 ];
 #
-# $hb
-#  Left: Device ID to be used for heartbeat on primary server and secondary server
-#  Right: Priority of the heartbeat
-my $hb =
+# $khb
+#  Left: Device ID to be used for kernel heartbeat on primary server and secondary server
+#  Right: Priority of the kernel heartbeat
+my $khb =
 [
     ['0', '0'],
     ['1', '1'],
@@ -166,11 +166,11 @@ for ($i = 0; $i < scalar(@$server); $i++)
     }
 }
 
-# add a heartbeat interface to a cluster
-for ($i = 0; $i < scalar(@$hb); $i++)
+# add a kernel heartbeat interface to a cluster
+for ($i = 0; $i < scalar(@$khb); $i++)
 {
-    next if (scalar(@{$hb->[$i]}) == 0);
-    $ret = `$clpcreate add hb $hb->[$i][0] $hb->[$i][1]`;
+    next if (scalar(@{$khb->[$i]}) == 0);
+    $ret = `$clpcreate add khb $khb->[$i][0] $khb->[$i][1]`;
 }
 
 # add a disk heartbeat to a cluster

@@ -181,7 +181,7 @@ make_child_node(
 
 	if (strlen(attr_var) > 0)
 	{
-		if (!strcmp(node_name, "device") | !strcmp(node_name, "list") | !strcmp(node_name, "hba") | !strcmp(node_name, "grp"))
+		if (!strcmp(node_name, "device") | !strcmp(node_name, "list") | !strcmp(node_name, "hba") | !strcmp(node_name, "grp") | !strcmp(node_name, "servers"))
 		{
 			strcpy(attr_name, "id");
 		}
