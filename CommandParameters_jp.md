@@ -15,6 +15,7 @@
 - [リソースの依存関係の追加](#リソースの依存関係の追加)
 - [モニタリソースの追加](#モニタリソースの追加)
 - [クラスタのパラメータ](#クラスタのパラメータ)
+- [グループのパラメータ](#グループのパラメータ)
 - [リソースのパラメータ](#リソースのパラメータ)
 - [モニタリソースのパラメータ](#モニタリソースのパラメータ)
 
@@ -134,7 +135,9 @@ $ clpcreate add srv <サーバ名> <プライオリティ>
 $ clpcreate add ip <サーバ名> <デバイスID> <IPアドレス>
 ```
 - サーバ名: クラスタのサーバ名を指定してください (e.g. hostname コマンドの実行結果)。
-- デバイスID: 各サーバのIPアドレスのデバイスIDを 0 から指定してください。以降のデバイスIDは 1 ずつインクリメントしてください。
+- デバイスID: 各サーバのIPアドレスのデバイスIDを指定してください。以降のデバイスIDは 1 ずつインクリメントしてください。
+  - ユーザモードハートビート、カーネルモードハートビートは 0 から始まります。
+  - BMCハートビートは、600 から始まります。
   - デバイスIDはサーバ毎で独立となっています。(デバイスID 0 が複数存在することになる。)
 - IPアドレス: CLUSTERPROで用いるIPアドレスを指定してください。
 - サンプルスクリプトでは、以下のように設定しています。
@@ -159,19 +162,19 @@ $ clpcreate add ip <サーバ名> <デバイスID> <IPアドレス>
       }
   }
   ```
-
-## ハートビートの追加
+  
+## カーネルモードハートビートの追加
 ```bash
-$ clpcreate add hb <デバイスID> <プライオリティ>
+$ clpcreate add khb <デバイスID> <プライオリティ>
 ```
 - デバイスID: IPアドレスのデバイスIDを指定してください。
 - プライオリティ: ハートビートのプライオリティは 0 から指定してください。
 - サンプルスクリプトでは、以下のように設定しています。
   ```perl
-  # $hb
-  #  Left : Device ID to be used for heartbeat on primary and secondary server
-  #  Right: Priority of the heartbeat
-  my $hb =
+  # $khb
+  #  Left : Device ID to be used for kernel heartbeat on primary and secondary server
+  #  Right: Priority of the kernel heartbeat
+  my $khb =
   [
       ['0', '0'],
       ['1', '1'],
@@ -180,13 +183,20 @@ $ clpcreate add hb <デバイスID> <プライオリティ>
       []
   ];
    :
-  # add a heartbeat interface to a cluster
-  for ($i = 0; $i < scalar(@$hb); $i++)
+  # add a kernel heartbeat interface to a cluster
+  for ($i = 0; $i < scalar(@$khb); $i++)
   {
-      next if (scalar(@{$hb->[$i]}) == 0);
-      $ret = `$clpcreate add hb $hb->[$i][0] $hb->[$i][1]`;
+      next if (scalar(@{$khb->[$i]}) == 0);
+      $ret = `$clpcreate add khb $khb->[$i][0] $khb->[$i][1]`;
   }
   ```
+  
+## ユーザモードハートビートの追加
+```bash
+$ clpcreate add hb <デバイスID> <プライオリティ>
+```
+- デバイスID: IPアドレスのデバイスIDを指定してください。
+- プライオリティ: ハートビートのプライオリティは 0 から指定してください。
 
 ## ディスクハートビートの追加
 ```bash
@@ -197,7 +207,7 @@ $ clpcreate add diskhbsrv <デバイスID> <ディスクデバイス>
   - clpcreate add diskhb
   - clpcreate add diskhbsrv
 - デバイスID: ディスクハートビートのデバイスIDを 300 から指定してください。以降のデバイスIDは1ずつインクリメントしてください。
-- プライオリティ: ハートビートのプライオリティを指定してください。
+- プライオリティ: ハートビートのプライオリティは 0 から指定してください。
 - ディスクデバイス: ディスクハートビートで用いるデバイスのパスを指定してください。
   - 現在は、両サーバのディスクデバイスのパスが同一であることを前提としています。
 - サンプルスクリプトでは、以下のように設定しています。
@@ -276,13 +286,25 @@ $ clpcreate add npsrv ping <サーバ名> <デバイスID> <使用の有無>
       }
   }
   ```
+  
+## BMCハートビートの追加
+```bash
+$ clpcreate add bmchb <デバイスID> <プライオリティ>
+```
+- デバイスID: IPアドレスのデバイスIDを指定してください。
+- プライオリティ: ハートビートのプライオリティは 0 から指定してください。
 
 ## グループの追加
 ```bash
-$ clpcreate add <グループのタイプ> <グループ名>
+# グループの追加
+$ clpcreate add grp <グループのタイプ> <グループ名>
+
+# グループのパラメータの追加
+$ clpcreate add grpparam <グループのタイプ名> <グループ名> <タグ名> <パラメータ>
 ```
 - グループのタイプ: 通常のグループには **failover** を指定してください。
 - グループ名: グループ名を指定してください。
+- タグ名、パラメータについては、[グループのパラメータ](#グループのパラメータ)を参照してください。
 - サンプルスクリプトでは、以下のように設定しています。
   ```perl
   my $group =
@@ -497,7 +519,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   |  10|BMC NMI||
   |  11|I/O-Fencing(High-End Server Option)||
 
-#### リカバリ
+#### 監視
 - haltp/method: 監視方法
   - softdog
   - keepalive
@@ -511,6 +533,27 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
     ```bash
     $ clpcreate add clsparam haltp/action PANIC
     ```
+
+#### WebManager
+- webmgr/security/clientlist/iprest: クライアントのIPアドレスによって接続を制御する
+  - 0: 制御しない
+  - 1: 制御する
+- webmgr/security/ip@\<IPアドレス\>: 接続を許可するクライアントIPアドレス
+  - 値に空文字を入力してください
+  ```
+  $ clpcreate add clsparam webmgr/security/ip@192.168.100.1 ""
+  $ clpcreate add clsparam webmgr/security/ip@192.168.100.2 ""
+  ```
+
+## グループのパラメータ
+#### 起動サーバ
+- 起動可能なサーバを個別に設定する場合は、以下のパラメータを設定してください。(デフォルトは全てのサーバでフェイルオーバ可能)
+- policy@\<サーバ名\>/order: 起動可能なサーバと優先順位
+- 優先順位は0が一番高い
+  ```bash
+  $ clpcreate add grpparam failover failover1 policy@server1 0
+  $ clpcreate add grpparam failover failover1 policy@server2 1
+  ```
 
 ## リソースのパラメータ
 ### 共通パラメータ
@@ -616,6 +659,16 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
     $ clpcreate add monparam fipw fipw1 target fip1
     ```
 - firstmonwait: 監視開始待ち時間
+- polling/servers@\<id\>/name: 監視を行うサーバを選択する
+  - 監視を行うサーバが1つの場合、以下のように実行してください。
+    ```bash
+    $ clpcreate add monparam fipw fipw1 parameters/servers@0/name <サーバ名>
+    ```
+  - 監視を行うサーバが2つ以上の場合、以下のように実行してください。
+    ```bash
+    $ clpcreate add monparam fipw fipw1 parameters/servers@0/name <サーバ名>
+    $ clpcreate add monparam fipw fipw1 parameters/servers@1/name <サーバ名>
+    ```
 
 #### 回復動作
 - カスタム設定のみ対応しています。
