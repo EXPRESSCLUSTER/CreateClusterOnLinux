@@ -146,7 +146,7 @@ my $i = 0;
 my $j = 0;
 my $k = 0;
 # initialize
-$ret = `$clpcreate init $cluster{'encode'}`;
+$ret = `$clpcreate init $cluster{'charset'}`;
 
 # add a cluster to initial configuration
 $ret = `$clpcreate add cls $cluster{'name'} $cluster{'charset'} $cluster{'encode'} $cluster{'os'}`;
