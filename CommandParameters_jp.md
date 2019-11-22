@@ -23,19 +23,30 @@
 
 ## クラスタ構成情報ファイルの初期化
 ```bash
-$ clpcreate init <エンコードの種類>
+$ clpcreate init <エンコード>
 ```
-- エンコードの種類は、クラスタのプロパティを参照してください。
+- エンコードは、CLUSTERPROの言語に応じて次の値を入力してください。
+  - EUC-JP: 日本語
+  - ASCII: 英語
+  - GB2312: 中国語
 
 ## クラスタの追加
 ```bash
 # クラスタの追加
-$ clpcreate add cls <クラスタ名> <エンコード> <OS の種類>
+$ clpcreate add cls <クラスタ名> <文字コード> <エンコード> <OS の種類>
 
 # クラスタのパラメータの追加
 $ clpcreate add clsparam <タグ名> <パラメータ>
 ```
-- エンコード: クラスタサーバの OS の言語を指定してください。日本語の場合は EUC-JP を指定してください。
+- 文字コード: CLUSTERPRO の言語に応じて次の値を入力してください。
+  - EUC-JP: 日本語
+  - ASCII: 英語
+  - GB2312: 中国語
+- エンコード: WebUI で clp.conf を作成した場合に、WebUI が動くサーバの OS と CLUSTERPRO の言語により決定されるパラメータです。
+  - OS が Windowsの場合: SJIS
+  - OS が Linux かつ日本語の場合: EUC-JP
+  - OS が Linux かつ英語の場合: ASCII
+  - OS が Linux かつ中国語の場合: GB2312
 - OS の種類: クラスタサーバの OS の種類を指定してください。
 - タグ名、パラメータについては、[クラスタのパラメータ](#クラスタのパラメータ)を参照してください。
 - サンプルスクリプトでは、以下のように設定しています。
@@ -540,12 +551,15 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 - webmgr/security/clientlist/iprest: クライアントのIPアドレスによって接続を制御する
   - 0: 制御しない
   - 1: 制御する
-- webmgr/security/ip@\<IPアドレス\>: 接続を許可するクライアントIPアドレス
-  - 値に空文字を入力してください
   ```
-  $ clpcreate add clsparam webmgr/security/ip@192.168.100.1 ""
-  $ clpcreate add clsparam webmgr/security/ip@192.168.100.2 ""
+  $ clpcreate add clsparam webmgr/security/clientlist/iprest 1
   ```
+  - webmgr/security/clientlist/ip@\<IPアドレス\>: 接続を許可するクライアントIPアドレス
+    - 値に空文字を入力してください
+    ```
+    $ clpcreate add clsparam webmgr/security/clientlist/ip@192.168.100.1 ""
+    $ clpcreate add clsparam webmgr/security/clientlist/ip@192.168.100.2 ""
+    ```
 
 ## グループのパラメータ
 #### 起動サーバ
@@ -553,8 +567,8 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 - policy@\<サーバ名\>/order: 起動可能なサーバと優先順位
 - 優先順位は0が一番高い
   ```bash
-  $ clpcreate add grpparam failover failover1 policy@server1 0
-  $ clpcreate add grpparam failover failover1 policy@server2 1
+  $ clpcreate add grpparam failover failover1 policy@server1/order 0
+  $ clpcreate add grpparam failover failover1 policy@server2/order 1
   ```
 
 ## リソースのパラメータ
@@ -664,12 +678,12 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 - polling/servers@\<id\>/name: 監視を行うサーバを選択する
   - 監視を行うサーバが1つの場合、以下のように実行してください。
     ```bash
-    $ clpcreate add monparam fipw fipw1 parameters/servers@0/name <サーバ名>
+    $ clpcreate add monparam fipw fipw1 polling/servers@0/name <サーバ名>
     ```
   - 監視を行うサーバが2つ以上の場合、以下のように実行してください。
     ```bash
-    $ clpcreate add monparam fipw fipw1 parameters/servers@0/name <サーバ名>
-    $ clpcreate add monparam fipw fipw1 parameters/servers@1/name <サーバ名>
+    $ clpcreate add monparam fipw fipw1 polling/servers@0/name <サーバ名>
+    $ clpcreate add monparam fipw fipw1 polling/servers@1/name <サーバ名>
     ```
 
 #### 回復動作
