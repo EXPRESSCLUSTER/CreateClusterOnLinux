@@ -24,7 +24,7 @@ xmlNodePtr find_child_node(xmlDocPtr doc, xmlNodePtr node, char *element, char *
 xmlNodePtr make_child_node(xmlNodePtr node, char *node_name, char *attr_var);
 
 //clpcreate.c
-int add_cls(char *clsname, char *lang, char *os);
+int add_cls(char *clsname, char *charset, char *encode, char *os);
 int add_srv(char *srvname, char *priority);
 int add_hba(char *srvname, char *id, char *tag, char *param);
 int add_ip(char *srvname, char *id, char *ipaddr);
@@ -48,7 +48,6 @@ int add_disknpsrv(char *srvname, char *id, char *guid, char *letter);
 int add_cls_param(char *tag, char *param);
 int add_obj_num(char *objnum);
 int cal_obj_num(void);
-int rpl_obj_num(char *objnum);
 int count_hb(void);
 int count_khb(void);
 int count_server(void);

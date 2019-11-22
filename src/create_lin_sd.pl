@@ -20,13 +20,22 @@ my $clpcreate = './clpcreate';
 my $type = 1;
 #
 # %cluster
+#  charset:
+#    This parameter depends on the language of CLUSTERPRO
+#    Japanese: EUC-JP
+#    English : ASCII
+#    Chinese : GB2312
 #  encode:
-#   Japanese: EUC-JP (for Linux)
-#   English : ASCII
-#   Chinese : GB2312
+#    This parameter depends on the language of a server that you use to access WebUI
+#    If you use WebUI on Windows machine
+#      SJIS
+#    If you use WebUI on Linux macine
+#      EUC-JP: Japanese
+#      ASCII : ASCII
+#      GB2312: Chinese
 #  os:
 #   windows or linux
-my %cluster = (name=>'cluster', encode=>'EUC-JP', os=>'linux');
+my %cluster = (name=>'cluster', charset=>'EUC-JP', encode=>'EUC-JP', os=>'linux');
 # $cluster_param
 #  tag, parameter
 my $cluster_param =
@@ -140,7 +149,7 @@ my $k = 0;
 $ret = `$clpcreate init $cluster{'encode'}`;
 
 # add a cluster to initial configuration
-$ret = `$clpcreate add cls $cluster{'name'} $cluster{'encode'} $cluster{'os'}`;
+$ret = `$clpcreate add cls $cluster{'name'} $cluster{'charset'} $cluster{'encode'} $cluster{'os'}`;
 
 # add a cluster parameter
 for ($i = 0; $i < scalar(@$cluster_param); $i++)

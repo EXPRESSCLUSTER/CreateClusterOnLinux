@@ -38,7 +38,7 @@ main(
 	{
 		if (!strcmp(argv[2], "cls"))
 		{
-			add_cls(argv[3], argv[4], argv[5]);
+			add_cls(argv[3], argv[4], argv[5], argv[6]);
 		}
 		else if (!strcmp(argv[2], "srv"))
 		{
@@ -164,7 +164,8 @@ func_exit:
 int
 add_cls(
 	char *clsname,
-	char *lang,
+	char *charset,
+	char *encode,
 	char *os
 )
 {
@@ -173,7 +174,7 @@ add_cls(
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
 
-	ret = set_value(g_doc, "/root/all/charset", lang);
+	ret = set_value(g_doc, "/root/all/charset", charset);
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);
@@ -185,7 +186,7 @@ add_cls(
 		printf("set_value() failed. (ret: %d)\n", ret);
 		ret = CONF_ERR_FILE;
 	}
-	ret = set_value(g_doc, "/root/all/encode", lang);
+	ret = set_value(g_doc, "/root/all/encode", encode);
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);
@@ -541,20 +542,33 @@ add_grp(
 )
 {
 	char 	path[CONF_PATH_LEN];
+	char	gid[16];
 	int 	ret;
 
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
 
-	sprintf(path, "/root/group@%s/type", grpname);
-	ret = set_value(g_doc, path, grptype);
+	ret = count_group();
+	sprintf(gid, "%d", ret);
+
+    if (strcmp(grptype, "failover")) {
+		sprintf(path, "/root/group@%s/type", grpname);
+		ret = set_value(g_doc, path, grptype);
+		if (ret)
+		{
+			printf("set_value() failed. (ret: %d)\n", ret);
+			ret = CONF_ERR_FILE;
+		}
+	}
+	sprintf(path, "/root/group@%s/comment", grpname);
+	ret = set_value(g_doc, path, "");
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);
 		ret = CONF_ERR_FILE;
 	}
-	sprintf(path, "/root/group@%s/comment", grpname);
-	ret = set_value(g_doc, path, "");
+	sprintf(path, "/root/group@%s/gid", grpname);
+	ret = set_value(g_doc, path, gid);
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);
@@ -1012,20 +1026,6 @@ cal_obj_num()
 
 func_exit:
 	return objnum;
-}
-
-int
-rpl_obj_num(
-	char *objnum
-)
-{
-	int ret;
-
-	/* initialize */
-	ret = CONF_ERR_SUCCESS;
-
-func_exit:
-	return 0;
 }
 
 int
