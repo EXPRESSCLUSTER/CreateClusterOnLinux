@@ -555,11 +555,10 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   ```
   $ clpcreate add clsparam webmgr/security/clientlist/iprest 1
   ```
-  - webmgr/security/clientlist/ip@\<IPアドレス\>: 接続を許可するクライアントIPアドレス
-    - 値に空文字を入力してください
+  - 制御対象のIPアドレスは、以下で設定してください。 
     ```
-    $ clpcreate add clsparam webmgr/security/clientlist/ip@192.168.100.1 ""
-    $ clpcreate add clsparam webmgr/security/clientlist/ip@192.168.100.2 ""
+    $ clpcreate add webmgr clientlist 192.168.100.1
+    $ clpcreate add webmgr clientlist 192.168.100.0/24
     ```
 
 ## グループのパラメータ

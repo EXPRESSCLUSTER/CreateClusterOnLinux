@@ -46,6 +46,7 @@ int add_disknp(char *npname, char *priority, char *id);
 int add_pingnpsrv(char *srvname, char *id, char *grpid); 
 int add_disknpsrv(char *srvname, char *id, char *guid, char *letter);
 int add_cls_param(char *tag, char *param);
+int add_cls_webmgr(char *tag, char *param);
 int add_obj_num(char *objnum);
 int cal_obj_num(void);
 int count_hb(void);

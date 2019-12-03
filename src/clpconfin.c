@@ -9,7 +9,8 @@
 #include "clpcreate.h"
 
 int child_hit_flag;
-
+extern int	g_webmgr;
+extern char	g_subnet[CONF_PATH_LEN];
 
 int
 init(
@@ -175,7 +176,8 @@ make_child_node(
 	xmlNodePtr	new_node = NULL;
 	xmlNodePtr	ret_node;
 	int			ret = 0;
-	char		attr_name[1024];
+	char		attr_name[CONF_PATH_LEN];
+	char		attr_var2[CONF_PATH_LEN];
 
 	new_node = xmlNewNode(NULL, node_name);
 
@@ -188,9 +190,31 @@ make_child_node(
 		else
 		{
 			strcpy(attr_name, "name");
+			if (g_webmgr == 1)
+			{
+				if (!strlen(g_subnet))
+				{
+					strcpy(attr_var2, attr_var);
+					printf("### DEBUG ### %s\n", attr_var2);
+				}
+				else
+				{
+					printf("%s\n", attr_var);
+					printf("%s\n", g_subnet);
+					sprintf(attr_var2, "%s/%s", attr_var, g_subnet);
+					printf("### DEBUG ### %s\n", attr_var2);
+				}
+			}
 		}
-
-		xmlNewProp(new_node, attr_name, attr_var);
+		if (g_webmgr == 1)
+		{
+			xmlNewProp(new_node, attr_name, attr_var2);
+			g_webmgr = 0;
+		}
+		else
+		{
+			xmlNewProp(new_node, attr_name, attr_var);
+		}
 	}
 
 	ret_node = xmlAddChild(node, new_node);

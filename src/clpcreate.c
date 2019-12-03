@@ -9,6 +9,9 @@
 
 static xmlDocPtr	g_doc = NULL;
 static char			*g_encoding[16];
+int		g_webmgr = 0;
+char	g_ip[1024];
+char	g_subnet[1024];
 
 int
 main(
@@ -137,6 +140,11 @@ main(
 		else if (!strcmp(argv[2], "clsparam"))
 		{
 			add_cls_param(argv[3], argv[4]);
+		}
+		else if (!strcmp(argv[2], "webmgr"))
+		{
+			g_webmgr = 1;
+			add_cls_webmgr(argv[3], argv[4]);
 		}
 		else
 		{
@@ -979,6 +987,53 @@ add_cls_param(
 		printf("set_value() failed. (ret: %d)\n", ret);
 		ret = CONF_ERR_FILE;
 	}
+func_exit:
+	return ret;
+}
+
+int
+add_cls_webmgr(
+	char *tag,
+	char *param
+)
+{
+	char 	path[CONF_PATH_LEN];
+	char	buf[CONF_PATH_LEN];
+	char	*token;
+	int		ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+	memset(path, "\0", sizeof(path)); 
+	memset(buf, "\0", sizeof(buf)); 
+
+	if (!strcmp(tag, "clientlist"))
+	{
+		strcpy(buf, param);
+		token = strchr(buf, '/');
+		if (!token)
+		{
+			/* no subnet mask */
+			strcpy(g_ip, buf);
+			printf("### DEBUG ### g_ip %s\n", g_ip);
+		}
+		else
+		{
+			strncpy(g_ip, buf, token - buf);
+			g_ip[token - buf] = '\0';
+			strcpy(g_subnet, token + 1);	
+			printf("### DEBUG ### g_ip %s\n", g_ip);
+			printf("### DEBUG ### g_subnet %s\n", g_subnet);
+		}
+		sprintf(path, "/root/webmgr/security/clientlist/ip@%s", g_ip);
+		ret = set_value(g_doc, path, NULL);
+		if (ret)
+		{
+			printf("set_value() failed. (ret: %d)\n", ret);
+			ret = CONF_ERR_FILE;
+		}
+	}
+
 func_exit:
 	return ret;
 }
