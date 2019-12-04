@@ -195,14 +195,12 @@ make_child_node(
 				if (!strlen(g_subnet))
 				{
 					strcpy(attr_var2, attr_var);
-					printf("### DEBUG ### %s\n", attr_var2);
 				}
 				else
 				{
 					printf("%s\n", attr_var);
 					printf("%s\n", g_subnet);
 					sprintf(attr_var2, "%s/%s", attr_var, g_subnet);
-					printf("### DEBUG ### %s\n", attr_var2);
 				}
 			}
 		}
