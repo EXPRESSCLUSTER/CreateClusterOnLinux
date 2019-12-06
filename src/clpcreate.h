@@ -53,7 +53,8 @@ int count_hb(void);
 int count_khb(void);
 int count_server(void);
 int count_group(void);
-int count_device(void);
+int count_heartbeat(void);
+int count_networkpartition(void);
 int count_resource(void);
 int count_monitor(void);
 #endif
