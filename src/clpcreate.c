@@ -1097,20 +1097,22 @@ cal_obj_num()
 {
 	int objnum = 0;
 	int srvnum = 0;
-	int devnum = 0;
+	int htbnum = 0;
+	int nprnum = 0;
 	int grpnum = 0;
 	int rscnum = 0;
 	int monnum = 0;
 
-	/* cluster, server, resource, monitor icon */
+	/* cluster, server, group, monitor icon */
 	objnum += 4;
 
 	srvnum = count_server();
-	devnum = count_device();
+	htbnum = count_heartbeat();
+	nprnum = count_networkpartition();
 	grpnum = count_group();
 	rscnum = count_resource();
 	monnum = count_monitor();
-	objnum += srvnum + devnum + grpnum + rscnum + monnum;
+	objnum += srvnum + grpnum + rscnum + monnum + ((htbnum + nprnum) * srvnum);
 
 func_exit:
 	return objnum;
@@ -1219,7 +1221,7 @@ count_group()
 }
 
 int
-count_device()
+count_heartbeat()
 {
 	xmlNodePtr	root_node = NULL;
 	xmlNodePtr  n;
@@ -1228,7 +1230,7 @@ count_device()
 	int			ret = 0;
 
 	root_node = xmlDocGetRootElement(g_doc);
-	strcpy(element, "server");
+	strcpy(element, "heartbeat");
 	
 	for (n = root_node->children; n != NULL; n = n->next)
 	{
@@ -1236,7 +1238,36 @@ count_device()
 		{
 			for (n_child = n->children; n_child != NULL; n_child = n_child->next)
 			{
-				if (!strcmp(n_child->name, "device"))
+				if (strcmp(n_child->name, "types") & strcmp(n_child->name, "text"))
+				{
+					ret++;
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
+int
+count_networkpartition()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n_child;
+	char		element[32];
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	strcpy(element, "networkpartition");
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, element))
+		{
+			for (n_child = n->children; n_child != NULL; n_child = n_child->next)
+			{
+				if (strcmp(n_child->name, "types") & strcmp(n_child->name, "text"))
 				{
 					ret++;
 				}
