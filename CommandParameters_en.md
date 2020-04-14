@@ -1,55 +1,55 @@
 # Command Parameters
-- clpcreate コマンドに指定可能なパラメータについて説明しています。
-- 各パラメータに入力可能な文字列や禁則文字列については、CLUSTERPRO のリファレンスガイドを参照してください。
+- This document describe the parameters that you can specify as an argument of clpcreate.
+- Please refer to EXPRESSCLUSTER Reference Guide for the character strings that can be specified or not allowed to include.
 
-## 目次
-- [クラスタ構成情報ファイルの初期化](#クラスタ構成情報ファイルの初期化)
-- [クラスタの追加](#クラスタの追加)
-- [サーバの追加](#サーバの追加)
-- [IPアドレスの追加](#IPアドレスの追加)
-- [カーネルモードハートビートの追加](#カーネルモードハートビートの追加)
-- [ユーザモードハートビートの追加](#ユーザモードハートビートの追加)
-- [ディスクハートビートの追加](#ディスクハートビートの追加)
-- [BMCハートビートの追加](#BMCハートビートの追加)
-- [ネットワークパーティション解決リソースの追加](#ネットワークパーティション解決リソースの追加)
-- [グループの追加](#グループの追加)
-- [リソースの追加](#リソースの追加)
-- [リソースの依存関係の追加](#リソースの依存関係の追加)
-- [モニタリソースの追加](#モニタリソースの追加)
-- [クラスタのパラメータ](#クラスタのパラメータ)
-- [グループのパラメータ](#グループのパラメータ)
-- [リソースのパラメータ](#リソースのパラメータ)
-- [モニタリソースのパラメータ](#モニタリソースのパラメータ)
+## Contents
+- [Initialization of cluster configuration file](#initialization)
+- [Cluster](#cluster)
+- [Server](#server)
+- [IP address](#ip)
+- [Kernel mode LAN heartbeat](#khb)
+- [LAN heartbeat](#hb)
+- [Disk hearbeat](#diskhb)
+- [BMC heartbeat](#bmchb)
+- [Network partition resolution resource](#np)
+- [Group](#group)
+- [Resource](#resource)
+- [Resource dependency](#rscdepend)
+- [Monitor resource](#mon)
+- [Cluster parameters](#clsparam)
+- [Group parameters](#grpparam)
+- [Resource parameters](#rscparam)
+- [Monitor resource parameters](#monparam)
 
-## クラスタ構成情報ファイルの初期化
+## [Initialization of cluster configuration file](#initialization)
 ```bash
-$ clpcreate init <エンコード>
+$ clpcreate init <encode>
 ```
-- エンコードは、CLUSTERPROの言語に応じて次の値を入力してください。
-  - EUC-JP: 日本語
-  - ASCII: 英語
-  - GB2312: 中国語
+- Input the following parameter depending language setting of EXPRESSCLUSTER.
+  - ASCII: English
+  - GB2312: Chinese
+  - EUC-JP: Japanese
 
-## クラスタの追加
+## [Cluster](#cluster)
 ```bash
-# クラスタの追加
-$ clpcreate add cls <クラスタ名> <文字コード> <エンコード> <OS の種類>
+# Add cluster
+$ clpcreate add cls <cluster name> <character code> <encode> <OS>
 
-# クラスタのパラメータの追加
-$ clpcreate add clsparam <タグ名> <パラメータ>
+# Add cluster parameter
+$ clpcreate add clsparam <tag> <parameter>
 ```
-- 文字コード: CLUSTERPRO の言語に応じて次の値を入力してください。
-  - EUC-JP: 日本語
-  - ASCII: 英語
-  - GB2312: 中国語
-- エンコード: WebUI で clp.conf を作成した場合に、WebUI が動くサーバの OS と CLUSTERPRO の言語により決定されるパラメータです。
-  - OS が Windowsの場合: SJIS
-  - OS が Linux かつ日本語の場合: EUC-JP
-  - OS が Linux かつ英語の場合: ASCII
-  - OS が Linux かつ中国語の場合: GB2312
-- OS の種類: クラスタサーバの OS の種類を指定してください。
-- タグ名、パラメータについては、[クラスタのパラメータ](#クラスタのパラメータ)を参照してください。
-- サンプルスクリプトでは、以下のように設定しています。
+- Character code: Input the following parameter depending language setting of EXPRESSCLUSTER.
+  - ASCII: English
+  - GB2312: Chinese
+  - EUC-JP: Japanese
+- Encode: The parameter is defined when creating clp.conf on WebUI. It depends on the language setting of EXPRESSCLUSTER and the server where WebUI is running.
+  - Windows OS: SJIS
+  - Linux OS / English: ASCII
+  - Linux OS / Chinese: GB2312
+  - Linux OS / Japanese: EUC-JP
+- OS: windows of linux
+- Please refer to [Cluster parameters](#clsparam) for tag name and each parameters.
+- The following is an example in sample scripts.
   ```perl
   my %cluster = (name=>'cluster', encode=>'EUC-JP', os=>'linux');
   my $cluster_param =
@@ -75,14 +75,13 @@ $ clpcreate add clsparam <タグ名> <パラメータ>
   }
   ```
 
-## サーバの追加
+## [Server](#server)
 ```bash
-$ clpcreate add srv <サーバ名> <プライオリティ>
+$ clpcreate add srv <server name> <priority>
 ``` 
-- サーバ名: クラスタのサーバ名を指定してください (e.g. hostname コマンドの実行結果)。
-- プライオリティ: マスタサーバが 0 になります。以降のサーバは 1 ずつインクリメントしてください。
-  - 2 ノード構成 (server1, server2) で、server1 がマスタサーバの場合、server1 のプライオリティが 0、server2 のプライオリティが 1 となります。
-- サンプルスクリプトでは、以下のように設定しています。
+- Server name: The server name in a cluster (e.g. The output of hostname command)
+- Priority: The master server's priority is 0. The server priority increases one by one.
+  - If a cluster consists of 2 node (server1 and server2) and server1 is the master server, server1's priority is 0 and server2's priority is 1.
   ```perl
   # $server
   #  Top of the list is master node.
@@ -90,7 +89,7 @@ $ clpcreate add srv <サーバ名> <プライオリティ>
   [
       ['server1'],
       ['server2'],
-      [] # 末尾に空の配列を挿入してください
+      [] # The last element must be an empty array.
   ];
    : 
   # add a server to a cluster
@@ -101,15 +100,15 @@ $ clpcreate add srv <サーバ名> <プライオリティ>
   }
   ```
 
-## IPアドレスの追加
+## [IP address](#ip)
 ```bash
-$ clpcreate add ip <サーバ名> <デバイスID> <IPアドレス>
+$ clpcreate add ip <server name> <device id> <ip address>
 ```
-- サーバ名: クラスタのサーバ名を指定してください (e.g. hostname コマンドの実行結果)。
-- デバイスID: 各サーバのIPアドレスのデバイスIDを指定してください。以降のデバイスIDは 1 ずつインクリメントしてください。
-  - ユーザモードハートビート、カーネルモードハートビートは 0 から始まります。
-    - 例: lanhb1のデバイスIDが0, lankhb1のデバイスIDが1, lanhb2のデバイスIDが2
-  - BMCハートビートは、600 から始まります。
+- Server name: The server name in a cluster (e.g. The output of hostname command)
+- Device ID: The device ID for the IP address of the server.The device ID increases one by one.
+  - LAN hearbeat and Kernel mode LAN hearbet start from device ID 0.
+    - e.g. lanhb1 is 0, lankhb1 is 1, lanhb2 is 2.
+  - BMC hearbeat starts from 600.
   - デバイスIDはサーバ毎で独立となっています。(デバイスID 0 が複数存在することになる。)
 - IPアドレス: CLUSTERPROで用いるIPアドレスを指定してください。
 - サンプルスクリプトでは、以下のように設定しています。
@@ -135,7 +134,7 @@ $ clpcreate add ip <サーバ名> <デバイスID> <IPアドレス>
   }
   ```
   
-## カーネルモードハートビートの追加
+## [Kernel mode LAN heartbeat](#khb)
 ```bash
 $ clpcreate add khb <デバイスID> <プライオリティ>
 ```
@@ -163,14 +162,14 @@ $ clpcreate add khb <デバイスID> <プライオリティ>
   }
   ```
   
-## ユーザモードハートビートの追加
+## [LAN heartbeat](#hb)
 ```bash
 $ clpcreate add hb <デバイスID> <プライオリティ>
 ```
 - デバイスID: IPアドレスのデバイスIDを指定してください。
 - プライオリティ: ハートビートのプライオリティは 0 から指定してください。
 
-## ディスクハートビートの追加
+## [Disk heartbeat](#diskhb)
 ```bash
 $ clpcreate add diskhb <デバイスID> <プライオリティ>
 $ clpcreate add diskhbsrv <デバイスID> <ディスクデバイス>
@@ -211,7 +210,7 @@ $ clpcreate add diskhbsrv <デバイスID> <ディスクデバイス>
   }
   ```
 
-## ネットワークパーティション解決リソースの追加
+## [Network partition resolution resource](#np)
 ```bash
 $ clpcreate add np ping <プライオリティ> <デバイスID> <グループID> <リストID> <IPアドレス>
 $ clpcreate add npsrv ping <サーバ名> <デバイスID> <使用の有無>
@@ -259,7 +258,7 @@ $ clpcreate add npsrv ping <サーバ名> <デバイスID> <使用の有無>
   }
   ```
   
-## BMCハートビートの追加
+## [BMC heartbeat](#bmchb)
 ```bash
 $ clpcreate add bmchb <デバイスID> <プライオリティ>
 $ clpcreate add bmchbsrv <サーバ名> <デバイスID> <IPアドレス>
@@ -268,7 +267,7 @@ $ clpcreate add bmchbsrv <サーバ名> <デバイスID> <IPアドレス>
 - プライオリティ: ハートビートのプライオリティは 0 から指定してください。
 - IPアドレス: BMCハートビートで用いるIPアドレスを指定してください。
 
-## グループの追加
+## [Group](#group)
 ```bash
 # グループの追加
 $ clpcreate add grp <グループのタイプ> <グループ名>
@@ -295,7 +294,7 @@ $ clpcreate add grpparam <グループのタイプ名> <グループ名> <タグ
   }
   ```
 
-## リソースの追加
+## [Resource](#resource)
 ```bash
 # リソースの追加
 $ clpcreate add rsc <リソースを追加するグループ名> <リソースのタイプ名> <リソース名>
@@ -337,7 +336,7 @@ $ clpcreate add rscparam <リソースのタイプ名> <リソース名> <タグ
   }
   ```
 
-## リソースの依存関係の追加
+## [Resource dependency](#rscdepend)
 ```bash
 $ clpcreate add rscdep <依存されるリソース名> <依存するリソース名>
 ```
@@ -370,7 +369,7 @@ $ clpcreate add rscdep <依存されるリソース名> <依存するリソー�
   }
   ```
 
-## モニタリソースの追加
+## [Monitor resource](#mon)
 ```bash
 # モニタリソースを追加する
 $ clpcreate add mon <モニタリソースのタイプ名> <モニタリソース名>
@@ -431,7 +430,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   }
   ```
 
-## クラスタのパラメータ
+## [Cluster parameters](#clsparam)
 #### リカバリ
 - pm/exec0/recover: クラスタサービスのプロセス異常時動作
 - pm/exec1/recover
@@ -512,103 +511,26 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 - webmgr/security/clientlist/iprest: クライアントのIPアドレスによって接続を制御する
   - 0: 制御しない
   - 1: 制御する
-    ```
-    $ clpcreate add clsparam webmgr/security/clientlist/iprest 1
-    ```
+  ```
+  $ clpcreate add clsparam webmgr/security/clientlist/iprest 1
+  ```
   - 制御対象のIPアドレスは、以下で設定してください。 
     ```
     $ clpcreate add webmgr clientlist 192.168.100.1
     $ clpcreate add webmgr clientlist 192.168.100.0/24
     ```
 
-## グループのパラメータ
+## [Group parameters](#grpparam)
 #### 起動サーバ
 - 起動可能なサーバを個別に設定する場合は、以下のパラメータを設定してください。(デフォルトは全てのサーバでフェイルオーバ可能)
 - policy@\<サーバ名\>/order: 起動可能なサーバと優先順位
-- 優先順位は0が最も高い
+- 優先順位は0が一番高い
   ```bash
   $ clpcreate add grpparam failover failover1 policy@server1/order 0
   $ clpcreate add grpparam failover failover1 policy@server2/order 1
   ```
 
-#### 属性
-- start: グループ起動属性
-  - 0: 手動起動
-  - 1: 自動起動
-    ```
-    $ clpcreate add grpparam failover failover1 start 0
-    ```
-
-- failover: フェイルオーバ属性
-  - 0: 手動フェイルオーバ
-  - 1: 自動フェイルオーバ
-    ```
-    $ clpcreate add grpparam failover failover1 failover 0
-    ```
-
-- failbackフェイルバック属性
-  - 0: 手動フェイルバック
-  - 1: 自動フェイルバック
-    ```
-    $ clpcreate add grpparam failover failover1 failback 0
-    ```
-
-- exclusive: フェイルオーバ排他属性 (X 3.3.5のみ)
-  - 0: 排他なし
-  - 1: 通常排他
-  - 2: 完全排他
-    ```
-    $ clpcreate add grpparam failover failover1 failback 1
-    ```
-
-#### 起動待ち合わせ
-- depend/act/depend@<グループ名>: 対象グループ
-  - 最後の引数に空文字を指定してください。
-  ```
-  $ clpcreate add grpparam failover failover1 depend/act/depend@failover2 ""
-  $ clpcreate add grpparam failover failover1 depend/act/depend@failover3 ""
-  ```
-
-- depend/act/depend@<グループ名>/sameserver: 同じサーバで起動する場合のみ待ち合わせを行う
-  - 0: 待ち合わせを行わない
-  - 1: 待ち合わせを行う
-  ```
-  $ clpcreate add grpparam failover failover1 depend/act/depend@failover2/sameserver 1
-  ```
-
-- depend/act/timeout: 対象グループの起動待ち時間
-  ```
-  $ clpcreate add grpparam failover failover1 depend/act/timeout 1000
-  ```
-
-#### 停止待ち合わせ
-- depend/deact/depend@<グループ名>: 対象グループ
-  - 最後の引数に空文字を指定してください。
-  ```
-  $ clpcreate add grpparam failover failover1 depend/deact/depend@failover2 ""
-  $ clpcreate add grpparam failover failover1 depend/deact/depend@failover3 ""
-  ```
-
-- depend/deact/timeout: 対象グループの起動待ち時間
-  ```
-  $ clpcreate add grpparam failover failover1 depend/deact/timeout 1000
-  ```
-
-- depend/deact/cluster/use: クラスタ停止時に対象グループの停止を待ち合わせる
-  - 0: 待ち合わせない
-  - 1: 待ち合わせる
-  ```
-  $ clpcreate add grpparam failover failover1 depend/deact/cluster/use 0
-  ```
-
-- depend/deact/server/use: サーバ停止時に対象グループの停止を待ち合わせる
-  - 0: 待ち合わせない
-  - 1: 待ち合わせる
-  ```
-  $ clpcreate add grpparam failover failover1 depend/deact/server/use 0
-  ```
-
-## リソースのパラメータ
+## [Resource parameters](#rscparam)
 ### 共通パラメータ
 #### 復旧動作
 - act/retry: 活性リトライしきい値
@@ -680,7 +602,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 - parameters/devname
   - LVM を使う場合、VG 名を指定してください。
 
-## モニタリソースのパラメータ
+## [Monitor resource parameters](#monparam)
 ### 共通パラメータ
 #### 監視 (共通)
 - polling/interval: 監視処理のインターバル
