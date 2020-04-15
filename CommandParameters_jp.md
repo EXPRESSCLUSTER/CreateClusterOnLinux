@@ -534,27 +534,27 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 #### 属性
 - start: グループ起動属性
   - 0: 手動起動
-  - 1: 自動起動
+  - 1: 自動起動 **(default)**
     ```
     $ clpcreate add grpparam failover failover1 start 0
     ```
 
 - failover: フェイルオーバ属性
   - 0: 手動フェイルオーバ
-  - 1: 自動フェイルオーバ
+  - 1: 自動フェイルオーバ **(default)**
     ```
     $ clpcreate add grpparam failover failover1 failover 0
     ```
 
 - failbackフェイルバック属性
-  - 0: 手動フェイルバック
+  - 0: 手動フェイルバック **(default)**
   - 1: 自動フェイルバック
     ```
-    $ clpcreate add grpparam failover failover1 failback 0
+    $ clpcreate add grpparam failover failover1 failback 1
     ```
 
 - exclusive: フェイルオーバ排他属性 (X 3.3.5のみ)
-  - 0: 排他なし
+  - 0: 排他なし **(default)**
   - 1: 通常排他
   - 2: 完全排他
     ```
@@ -570,13 +570,13 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   ```
 
 - depend/act/depend@<グループ名>/sameserver: 同じサーバで起動する場合のみ待ち合わせを行う
-  - 0: 待ち合わせを行わない
+  - 0: 待ち合わせを行わない **(default)**
   - 1: 待ち合わせを行う
   ```
   $ clpcreate add grpparam failover failover1 depend/act/depend@failover2/sameserver 1
   ```
 
-- depend/act/timeout: 対象グループの起動待ち時間
+- depend/act/timeout: 対象グループの起動待ち時間 **(default 1800)**
   ```
   $ clpcreate add grpparam failover failover1 depend/act/timeout 1000
   ```
@@ -589,23 +589,23 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   $ clpcreate add grpparam failover failover1 depend/deact/depend@failover3 ""
   ```
 
-- depend/deact/timeout: 対象グループの起動待ち時間
+- depend/deact/timeout: 対象グループの起動待ち時間 **(default 1800)**
   ```
   $ clpcreate add grpparam failover failover1 depend/deact/timeout 1000
   ```
 
 - depend/deact/cluster/use: クラスタ停止時に対象グループの停止を待ち合わせる
   - 0: 待ち合わせない
-  - 1: 待ち合わせる
+  - 1: 待ち合わせる **(default)**
   ```
   $ clpcreate add grpparam failover failover1 depend/deact/cluster/use 0
   ```
 
 - depend/deact/server/use: サーバ停止時に対象グループの停止を待ち合わせる
-  - 0: 待ち合わせない
+  - 0: 待ち合わせない **(default)**
   - 1: 待ち合わせる
   ```
-  $ clpcreate add grpparam failover failover1 depend/deact/server/use 0
+  $ clpcreate add grpparam failover failover1 depend/deact/server/use 1
   ```
 
 ## リソースのパラメータ
@@ -725,6 +725,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
 
 #### 回復動作
 - カスタム設定のみ対応しています。
+  - サンプルスクリプトをご利用の場合は、`my $type = 0;`と設定されていることをご確認ください。
 - 適切なパラメータを設定することで、テンプレート(「回復対象を再起動」等)の動作と同様の回復動作を設定することができます。
   - 回復対象に対してフェイルオーバ実行
     ```bash
