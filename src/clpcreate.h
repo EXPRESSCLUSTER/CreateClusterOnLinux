@@ -33,6 +33,8 @@ int add_hb(char *id, char *priority);
 int add_bmchb(char *id, char *primority);
 int add_diskhb(char *id, char *priority);
 int add_diskhbsrv(char *srvname, char *id, char *info);
+int add_bmchbsrv(char *srvname, char *id, char *info);
+int add_mdc(char *srvname, char *id, char *info);
 int add_grp(char *grptype, char *grpname); 
 int add_grp_param(char *grptype, char *grpname, char *tag, char *param); 
 int add_rsc(char *grpname, char *rsctype, char *rscname); 

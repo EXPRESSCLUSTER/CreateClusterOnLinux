@@ -79,6 +79,10 @@ main(
 		{
 			add_diskhbsrv(argv[3], argv[4], argv[5]);
 		}
+		else if (!strcmp(argv[2], "mdc"))
+		{
+			add_mdc(argv[3], argv[4], argv[5]);
+		}
 		else if (!strcmp(argv[2], "np"))
 		{
 			if (!strcmp(argv[3], "disk"))
@@ -577,6 +581,52 @@ add_diskhbsrv(
 func_exit:
 	return ret;
 }
+
+int
+add_mdc(
+	char* srvname,
+	char* id,
+	char* info
+)
+{
+	char	path[CONF_PATH_LEN];
+	char	*dev_number[16];
+	int		i;
+	int		ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	i = atoi(id) - 400;
+	i++;
+	sprintf(dev_number, "%d", i);
+
+	sprintf(path, "/root/server@%s/device@%s/type", srvname, id);
+	ret = set_value(g_doc, path, "mdc");
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/info", srvname, id);
+	ret = set_value(g_doc, path, info);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/mdc/info", srvname, id);
+	ret = set_value(g_doc, path, info);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+
+func_exit:
+	return ret;
+}
+
 
 
 int
