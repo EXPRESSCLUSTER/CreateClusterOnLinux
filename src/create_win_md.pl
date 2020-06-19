@@ -12,13 +12,6 @@ use warnings;
 #  Set the relative path for clpcreate.
 my $clpcreate = './clpcreate';
 #
-# $type
-#  Set type for final action of monitor resources.
-#  0: use default final action (do nothing)
-#  1: ignore timeout
-#  2: initiate BSoD/panic immediately
-my $type = 1;
-#
 # %cluster
 #  charset:
 #    This parameter depends on the language of CLUSTERPRO
