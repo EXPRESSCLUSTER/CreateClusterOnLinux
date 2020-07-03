@@ -3,25 +3,25 @@
 - Please refer to EXPRESSCLUSTER Reference Guide for the character strings that can be specified or not allowed to include.
 
 ## Contents
-- [Initialization of cluster configuration file](#initialization)
-- [Cluster](#cluster)
-- [Server](#server)
-- [IP address](#ip)
-- [Kernel mode LAN heartbeat](#khb)
-- [LAN heartbeat](#hb)
-- [Disk hearbeat](#diskhb)
-- [BMC heartbeat](#bmchb)
-- [Network partition resolution resource](#np)
-- [Group](#group)
-- [Resource](#resource)
-- [Resource dependency](#rscdepend)
-- [Monitor resource](#mon)
-- [Cluster parameters](#clsparam)
-- [Group parameters](#grpparam)
-- [Resource parameters](#rscparam)
-- [Monitor resource parameters](#monparam)
+- [Initialization of cluster configuration file](#Initialization-of-cluster-configuration-file)
+- [Cluster](#Cluster)
+- [Server](#Server)
+- [IP address](#IP-address)
+- [Kernel mode LAN heartbeat](#Kernel-mode-LAN-heartbeat)
+- [LAN heartbeat](#LAN-heartbeat)
+- [Disk hearbeat](#Disk-hearbeat)
+- [BMC heartbeat](#BMC-heartbeat)
+- [Network partition resolution resource](#Network-partition-resolution-resource-(PING-method))
+- [Group](#Group)
+- [Resource](#Resource)
+- [Resource dependency](#Resource-dependency)
+- [Monitor resource](#Monitor-resource)
+- [Cluster parameters](#Cluster-parameters)
+- [Group parameters](#Group-parameters)
+- [Resource parameters](#Resource-parameters)
+- [Monitor resource parameters](#Monitor-resource-parameters)
 
-## [Initialization of cluster configuration file](#initialization)
+## [Initialization of cluster configuration file](#Initialization-of-cluster-configuration-file)
 ```bash
 $ clpcreate init <encode>
 ```
@@ -30,7 +30,7 @@ $ clpcreate init <encode>
   - GB2312: Chinese
   - EUC-JP: Japanese
 
-## [Cluster](#cluster)
+## [Cluster](#Cluster)
 ```bash
 # Add cluster
 $ clpcreate add cls <cluster name> <character code> <encode> <OS>
@@ -75,7 +75,7 @@ $ clpcreate add clsparam <tag> <parameter>
   }
   ```
 
-## [Server](#server)
+## [Server](#Server)
 ```bash
 $ clpcreate add srv <server name> <priority>
 ``` 
@@ -101,7 +101,7 @@ $ clpcreate add srv <server name> <priority>
   }
   ```
 
-## [IP address](#ip)
+## [IP address](#IP-address)
 ```bash
 $ clpcreate add ip <server name> <device id> <ip address>
 ```
@@ -134,7 +134,7 @@ $ clpcreate add ip <server name> <device id> <ip address>
   }
   ```
   
-## [Kernel mode LAN heartbeat](#khb)
+## [Kernel mode LAN heartbeat](#Kernel-mode-LAN-heartbeat)
 ```bash
 $ clpcreate add khb <device id> <priority>
 ```
@@ -162,14 +162,14 @@ $ clpcreate add khb <device id> <priority>
   }
   ```
   
-## [LAN heartbeat](#hb)
+## [LAN heartbeat](#LAN-heartbeat)
 ```bash
 $ clpcreate add hb <device id> <priority>
 ```
 - Device ID: The device ID of the IP address
 - Priority: The priority of heartbeat starts from 0.
 
-## [Disk heartbeat](#diskhb)
+## [Disk heartbeat](#Disk-heartbeat)
 ```bash
 $ clpcreate add diskhb <device id> <priority>
 $ clpcreate add diskhbsrv <device id> <disk device name>
@@ -210,7 +210,7 @@ $ clpcreate add diskhbsrv <device id> <disk device name>
   }
   ```
 
-## [Network partition resolution resource (PING method)](#np)
+## [Network partition resolution resource (PING method)](#Network-partition-resolution-resource-(PING-method))
 ```bash
 $ clpcreate add np ping <priority> <device id> <group id> <list id> <ip address>
 $ clpcreate add npsrv ping <server name> <device id> <use>
@@ -258,7 +258,7 @@ $ clpcreate add npsrv ping <server name> <device id> <use>
   }
   ```
   
-## [BMC heartbeat](#bmchb)
+## [BMC heartbeat](#BMC-heartbeat)
 ```bash
 $ clpcreate add bmchbsrv <server name> <device id> <ip address>
 $ clpcreate add bmchb <device id> <priority>
@@ -268,7 +268,7 @@ $ clpcreate add bmchb <device id> <priority>
 - Priority: The priority of BMC heartbeat starts from 0.
 - IP address: The IP address that is used for BMC heartbeat.
 
-## [Group](#group)
+## [Group](#Group)
 ```bash
 # Add a group
 $ clpcreate add grp <group type> <group name>
@@ -295,7 +295,7 @@ $ clpcreate add grpparam <group type> <group name> <tag> <parameter>
   }
   ```
 
-## [Resource](#resource)
+## [Resource](#Resource)
 ```bash
 # Add a resource
 $ clpcreate add rsc <group name> <resource type> <resource name>
@@ -337,7 +337,7 @@ $ clpcreate add rscparam <resource type> <resource name> <tag> <parameter>
   }
   ```
 
-## [Resource dependency](#rscdepend)
+## [Resource dependency](#Resource-dependency)
 ```bash
 $ clpcreate add rscdep <depended resource name> <depending resource name>
 ```
@@ -370,7 +370,7 @@ $ clpcreate add rscdep <depended resource name> <depending resource name>
   }
   ```
 
-## [Monitor resource](#mon)
+## [Monitor resource](#Monitor-resource)
 ```bash
 # Add a monitor resource
 $ clpcreate add mon <monitor type> <monitor name>
@@ -431,7 +431,7 @@ $ clpcreate add monparam <monitor type> <monitor name> <tag> <parameter>
   }
   ```
 
-## [Cluster parameters](#clsparam)
+## [Cluster parameters](#Cluster-parameters)
 #### Recovery
 - pm/exec0/recover: Action When the Cluster Service Process Is Failure
 - pm/exec1/recover
@@ -522,7 +522,7 @@ $ clpcreate add monparam <monitor type> <monitor name> <tag> <parameter>
     $ clpcreate add webmgr clientlist 192.168.100.0/24
     ```
 
-## [Group parameters](#grpparam)
+## [Group parameters](#Group-parameters)
 #### Startup Server
 - You can specify the server that the group can start up on. (By default, a group can start up on all servers.)
 - policy@\<server name\>/order: Server and Order
@@ -532,7 +532,7 @@ $ clpcreate add monparam <monitor type> <monitor name> <tag> <parameter>
   $ clpcreate add grpparam failover failover1 policy@server2/order 1
   ```
 
-## [Resource parameters](#rscparam)
+## [Resource parameters](#Resource-parameters)
 ### Common parameters
 #### Recovery Operation
 - act/retry: Retry Count (at Activation Failure)
@@ -603,7 +603,7 @@ $ clpcreate add monparam <monitor type> <monitor name> <tag> <parameter>
 - parameters/devname: Target Name
   - If you use LVM, please specify the volume group name.
 
-## [Monitor resource parameters](#monparam)
+## [Monitor resource parameters](#Monitor-resource-parameters)
 ### Common parameters
 #### Monitor(common)
 - polling/interval: Interval
