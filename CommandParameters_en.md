@@ -42,7 +42,7 @@ $ clpcreate add clsparam <tag> <parameter>
   - ASCII: English
   - GB2312: Chinese
   - EUC-JP: Japanese
-- Encode: The parameter is defined when creating clp.conf on WebUI. It depends on the language setting of EXPRESSCLUSTER and the server where WebUI is running.
+- Encode: The parameter that is defined when creating clp.conf on WebUI. It depends on the language setting of EXPRESSCLUSTER and the server where WebUI is running.
   - Windows OS: SJIS
   - Linux OS / English: ASCII
   - Linux OS / Chinese: GB2312
@@ -79,9 +79,10 @@ $ clpcreate add clsparam <tag> <parameter>
 ```bash
 $ clpcreate add srv <server name> <priority>
 ``` 
-- Server name: The server name in a cluster (e.g. The output of hostname command)
+- Server name: The server name in a cluster (e.g. The output of hostname command). Alphabets must be small letters.
 - Priority: The master server's priority is 0. The server priority increases one by one.
   - If a cluster consists of 2 node (server1 and server2) and server1 is the master server, server1's priority is 0 and server2's priority is 1.
+- The following is an example in sample scripts.
   ```perl
   # $server
   #  Top of the list is master node.
@@ -104,14 +105,13 @@ $ clpcreate add srv <server name> <priority>
 ```bash
 $ clpcreate add ip <server name> <device id> <ip address>
 ```
-- Server name: The server name in a cluster (e.g. The output of hostname command)
+- Server name: The server name in a cluster.
 - Device ID: The device ID for the IP address of the server.The device ID increases one by one.
-  - LAN hearbeat and Kernel mode LAN hearbet start from device ID 0.
+  - The device ID of LAN hearbeat and Kernel mode LAN hearbet start from 0.
     - e.g. lanhb1 is 0, lankhb1 is 1, lanhb2 is 2.
-  - BMC hearbeat starts from 600.
-  - デバイスIDはサーバ毎で独立となっています。(デバイスID 0 が複数存在することになる。)
-- IPアドレス: CLUSTERPROで用いるIPアドレスを指定してください。
-- サンプルスクリプトでは、以下のように設定しています。
+  - The device ID is independent for each servers. (All cluster nodes have the device ID 0.)
+- IP address: The IP address that is used for Kernel mode LAN heartbeat or LAN heartbeat
+- The following is an example in sample scripts.
   ```perl
   # $ip
   #  Set IP addresses for the servers.
@@ -136,11 +136,11 @@ $ clpcreate add ip <server name> <device id> <ip address>
   
 ## [Kernel mode LAN heartbeat](#khb)
 ```bash
-$ clpcreate add khb <デバイスID> <プライオリティ>
+$ clpcreate add khb <device id> <priority>
 ```
-- デバイスID: IPアドレスのデバイスIDを指定してください。
-- プライオリティ: ハートビートのプライオリティは 0 から指定してください。
-- サンプルスクリプトでは、以下のように設定しています。
+- Device ID: The device ID of the IP address
+- Priority: The priority of heartbeat starts from 0.
+- The following is an example in sample scripts.
   ```perl
   # $khb
   #  Left : Device ID to be used for kernel heartbeat on primary and secondary server
@@ -164,24 +164,24 @@ $ clpcreate add khb <デバイスID> <プライオリティ>
   
 ## [LAN heartbeat](#hb)
 ```bash
-$ clpcreate add hb <デバイスID> <プライオリティ>
+$ clpcreate add hb <device id> <priority>
 ```
-- デバイスID: IPアドレスのデバイスIDを指定してください。
-- プライオリティ: ハートビートのプライオリティは 0 から指定してください。
+- Device ID: The device ID of the IP address
+- Priority: The priority of heartbeat starts from 0.
 
 ## [Disk heartbeat](#diskhb)
 ```bash
-$ clpcreate add diskhb <デバイスID> <プライオリティ>
-$ clpcreate add diskhbsrv <デバイスID> <ディスクデバイス>
+$ clpcreate add diskhb <device id> <priority>
+$ clpcreate add diskhbsrv <device id> <disk device name>
 ```
-- ディスクハートビートを追加するには、2つのコマンドを実行する必要があります。
+- You need to execute 2 commands to add a disk heartbeat.
   - clpcreate add diskhb
   - clpcreate add diskhbsrv
-- デバイスID: ディスクハートビートのデバイスIDを 300 から指定してください。以降のデバイスIDは1ずつインクリメントしてください。
-- プライオリティ: ハートビートのプライオリティは 0 から指定してください。
-- ディスクデバイス: ディスクハートビートで用いるデバイスのパスを指定してください。
-  - 現在は、両サーバのディスクデバイスのパスが同一であることを前提としています。
-- サンプルスクリプトでは、以下のように設定しています。
+- Device ID: The device ID of a disk heartbeat starts from 300. The device ID increases one by one.
+- Priority: The priority of heartbeat starts from 0.
+- Disk device name: The path of the device for disk heart beat.
+  - In current clpcreate version, the paths on both servers must be same.
+- The following is an example in sample scripts.
   ```perl
   # $diskhb
   #  Device ID, Heartbeat priority, Disk path
@@ -210,22 +210,22 @@ $ clpcreate add diskhbsrv <デバイスID> <ディスクデバイス>
   }
   ```
 
-## [Network partition resolution resource](#np)
+## [Network partition resolution resource (PING method)](#np)
 ```bash
-$ clpcreate add np ping <プライオリティ> <デバイスID> <グループID> <リストID> <IPアドレス>
-$ clpcreate add npsrv ping <サーバ名> <デバイスID> <使用の有無>
+$ clpcreate add np ping <priority> <device id> <group id> <list id> <ip address>
+$ clpcreate add npsrv ping <server name> <device id> <use>
 ```
-- NP解決リソースを追加するには、2つのコマンドを実行する必要があります。
+- To add a Network Partition Resolution Resource, execute 2 commands.
   - clpcreate add np
   - clpcreate add npsrv
-- プライオリティ: NP解決リソースのプライオリティは 0 から指定してください。
-- デバイスID: NP解決リソースのデバイスIDを 10200 から指定してください。以降のデバイスは 1 ずつインクリメントしてください。
-- グループID: NP解決リソースのグループIDを 0 から指定してください。以降のグループIDは 1 ずつインクリメントしてください。
-- リストID: IPアドレスのIDを 0 から指定してください。以降のIDは 1 ずつインクリメントしてください。
-- IPアドレス: NP解決リソースで用いるIPアドレスを指定してください。
-- サーバ名: サーバ名を指定してください。
-- 使用の有無: 各サーバについて、使用する場合は 1 、使用しない場合は空文字 "" を指定してください。
-- サンプルスクリプトでは、以下のように設定しています。
+- Priority: The priority of a NP resolution resource starts from 0.
+- Device ID: The device ID of a NP resolution resource starts from 10200. The device ID increases one by one.
+- Group ID: The group ID of a NP resolution resource starts from 0. The group ID increases one by one.
+- List ID: The list ID for IP address starts from 0. The list ID increases one by one.
+- IP address: The IP address that is used for ping NP resolution resource.
+- Server name: The server name in a cluster.
+- Use: For each server, specify whether using ping NP or not. If the server use the ping NP, Use is 1. If not, Use is empty string "".
+- The following is an example in sample scripts.
   ```perl
   # $pingnp
   #  Name, NP priority, Device ID, Group ID, [List ID, IP address], ...
@@ -260,25 +260,26 @@ $ clpcreate add npsrv ping <サーバ名> <デバイスID> <使用の有無>
   
 ## [BMC heartbeat](#bmchb)
 ```bash
-$ clpcreate add bmchb <デバイスID> <プライオリティ>
-$ clpcreate add bmchbsrv <サーバ名> <デバイスID> <IPアドレス>
+$ clpcreate add bmchbsrv <server name> <device id> <ip address>
+$ clpcreate add bmchb <device id> <priority>
 ```
-- デバイスID: IPアドレスのデバイスID 600 以降を指定してください。以降のデバイス ID は1ずつインクリメントしてください。
-- プライオリティ: ハートビートのプライオリティは 0 から指定してください。
-- IPアドレス: BMCハートビートで用いるIPアドレスを指定してください。
+- Server name: The server name in a cluster.
+- Device ID: The device ID of BMC heartbeat starts from 600. The device ID increases one by one.
+- Priority: The priority of BMC heartbeat starts from 0.
+- IP address: The IP address that is used for BMC heartbeat.
 
 ## [Group](#group)
 ```bash
-# グループの追加
-$ clpcreate add grp <グループのタイプ> <グループ名>
+# Add a group
+$ clpcreate add grp <group type> <group name>
 
-# グループのパラメータの追加
-$ clpcreate add grpparam <グループのタイプ名> <グループ名> <タグ名> <パラメータ>
+# Set a parameter to a group
+$ clpcreate add grpparam <group type> <group name> <tag> <parameter>
 ```
-- グループのタイプ: 通常のグループには **failover** を指定してください。
-- グループ名: グループ名を指定してください。
-- タグ名、パラメータについては、[グループのパラメータ](#グループのパラメータ)を参照してください。
-- サンプルスクリプトでは、以下のように設定しています。
+- Group type: The type of a failover group is **failover**.
+- Group name: The name of a group.
+- For the detail of tags and parameters, please refer to [Group parameters](#grpparam)
+- The following is an example in sample scripts.
   ```perl
   my $group =
   [
@@ -296,17 +297,17 @@ $ clpcreate add grpparam <グループのタイプ名> <グループ名> <タグ
 
 ## [Resource](#resource)
 ```bash
-# リソースの追加
-$ clpcreate add rsc <リソースを追加するグループ名> <リソースのタイプ名> <リソース名>
+# Add a resource
+$ clpcreate add rsc <group name> <resource type> <resource name>
 
-# リソースのパラメータの追加
-$ clpcreate add rscparam <リソースのタイプ名> <リソース名> <タグ名> <パラメータ>
+# Set a parameter to a resource
+$ clpcreate add rscparam <resource type> <resource name> <tag> <parameter>
 ```
-- リソースを追加するグループ名: リソースを追加したいグループ名を指定してください。
-- リソースのタイプ名: リソースのタイプ (e.g. fip, disk, exec) を指定してください。
-- リソース名: リソース名を指定してください。
-- タグ名、パラメータについては、[リソースのパラメータ](#リソースのパラメータ)を参照してください。
-- サンプルスクリプトでは、以下のように設定しています。
+- Group name: The name of a group which the resource is added to.
+- Resource type: The type of a resource (e.g. fip, disk, exec).
+- Resource name: The name of a resource.
+- For the detail of tags and parameters, please refer to [Resource parameters](#rscparam)
+- The following is an example in sample scripts.
   ```perl
   my $resource =
   [
@@ -338,11 +339,11 @@ $ clpcreate add rscparam <リソースのタイプ名> <リソース名> <タグ
 
 ## [Resource dependency](#rscdepend)
 ```bash
-$ clpcreate add rscdep <依存されるリソース名> <依存するリソース名>
+$ clpcreate add rscdep <depended resource name> <depending resource name>
 ```
-- グループの起動時、依存されるリソースの起動後、依存するリソースを起動します。
-- グループの停止時、依存するリソースの起動後、依存されるリソースを停止します。
-- サンプルスクリプトでは、以下のように設定しています。
+- When a group is starting, the depending resource is started after the depended resource has been started.
+- When a group is stopping, the depended resource is stopped after the depending resource has been stopped.
+- The following is an example in sample scripts.
   ```perl
   my $rscdepend =
   [
@@ -371,15 +372,15 @@ $ clpcreate add rscdep <依存されるリソース名> <依存するリソー�
 
 ## [Monitor resource](#mon)
 ```bash
-# モニタリソースを追加する
-$ clpcreate add mon <モニタリソースのタイプ名> <モニタリソース名>
+# Add a monitor resource
+$ clpcreate add mon <monitor type> <monitor name>
 
-# モニタリソースのパラメータを追加する
-$ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> <タグ名> <パラメータ>
+# Set a parameter to a monitor resource
+$ clpcreate add monparam <monitor type> <monitor name> <tag> <parameter>
 ```
-- モニタリソースのタイプ名: モニタリソースのタイプ名 (e.g. diskw, fipw, pidw) を指定してください。
-- タグ名、パラメータについては、[モニタリソースのパラメータ](#モニタリソースのパラメータ)を参照してください。
-- サンプルスクリプトでは、以下のように設定しています。
+- Monitor type: The type of a monitor resource (e.g. diskw, fipw, pidw).
+- For the detail of tags and parameters, please refer to [Monitor resource parameters](#monparam)
+- The following is an example in sample scripts.
   ```perl
   my $monitor =
   [
@@ -431,113 +432,114 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   ```
 
 ## [Cluster parameters](#clsparam)
-#### リカバリ
-- pm/exec0/recover: クラスタサービスのプロセス異常時動作
+#### Recovery
+- pm/exec0/recover: Action When the Cluster Service Process Is Failure
 - pm/exec1/recover
 - pm/exec2/recover
-  - 上記 3 つのパス全てに同じ値を設定してください。
+  - Set the same value to the 3 tags above.
     ```bash
     $ clpcreate add clsparam pm/exec0/recover 7
     $ clpcreate add clsparam pm/exec1/recover 7
     $ clpcreate add clsparam pm/exec2/recover 7
     ```
-  |数値|最終動作|備考|
+  |Value|Final Action|Note|
   |----|---------|--|
-  |   2|OSシャットダウン||
-  |   3|OS再起動||
-  |   5|sysrqパニック||
-  |   6|keepaliveリセット||
-  |   7|keepaliveパニック||
-  |   8|BMCリセット||
-  |   9|BMCパワーオフ||
-  |  10|BMCパワーサイクル||
+  |   2|Shut down the OS||
+  |   3|Reboot the OS||
+  |   5|Sysrq Panic||
+  |   6|Keepalive Reset||
+  |   7|Keepalive Panic||
+  |   8|BMC Reset||
+  |   9|BMC Power Off||
+  |  10|BMC Power Cycle||
   |  11|BMC NMI||
   |  12|I/O-Fencing(High-End Server Option)||
 
-- cluster/rsctimeout/rsctoaction: グループリソースの活性/非活性ストール発生時動作
+- cluster/rsctimeout/rsctoaction: Action at Group Resource Activation or Deactivation Stall
   ```bash
   $ clpcreate add clsparam cluster/rsctimeout/rsctoaction 0
   ```
-  |数値|最終動作|備考|
+  |Value|Final Action|Note|
   |----|---------|--|
-  |既定値|クラスタサービス停止とOSシャットダウン||
-  |   0|何もしない(活性/非活性異常として扱う)||
-  |   3|クラスタサービス停止とOS再起動||
-  |   8|sysrqパニック||
-  |   9|keepaliveリセット||
-  |  10|keepaliveパニック||
-  |  11|BMCリセット||
-  |  12|BMCパワーオフ||
-  |  13|BMCパワーサイクル||
+  |Default|Stop the cluster service and shutdown the OS||
+  |   0|No operation (Operates as an activity or deactivity failure)||
+  |   3|Stop the cluster service and reboot the OS||
+  |   8|Sysrq Panic||
+  |   9|Keepalive Reset||
+  |  10|Keepalive Panic||
+  |  11|BMC Reset||
+  |  12|BMC Powers Off||
+  |  13|BMC Power Cycle||
   |  14|BMC NMI||
   |  15|I/O-Fencing(High-End Server Option)||
 
-- cluster/networkpartition/npaction: NP発生時動作
+#### NP Resolution
+- cluster/networkpartition/npaction: Action at NP Occurence
   ```bash
   $ clpcreate add clsparam cluster/networkpartiton/npaction 6
   ```
-  |数値|最終動作|備考|
+  |Value|Final Action|Note|
   |----|---------|--|
-  |既定値|クラスタサービス停止とOSシャットダウン||
-  |   0|何もしない(活性/非活性異常として扱う)||
-  |   1|クラスタサービス停止||
-  |   2|クラスタサービス停止とOSシャットダウン||
-  |   3|クラスタサービス停止とOS再起動||
-  |   4|sysrqパニック||
-  |   5|keepaliveリセット||
-  |   6|keepaliveパニック||
-  |   7|BMCリセット||
-  |   8|BMCパワーオフ||
-  |   9|BMCパワーサイクル||
+  |Default|Stop the cluster service and shutdown the OS||
+  |   0|No operation (Operates as an activity or deactivity failure)||
+  |   1|Stop the cluster service||
+  |   2|Stop the cluster service and shutdown OS||
+  |   3|Stop the cluster service and reboot OS||
+  |   4|Sysrq Panic||
+  |   5|Keepalive Reset||
+  |   6|Keepalive Panic||
+  |   7|BMC Reset||
+  |   8|BMC Power Off||
+  |   9|BMC Power Cycle||
   |  10|BMC NMI||
   |  11|I/O-Fencing(High-End Server Option)||
 
-#### 監視
-- haltp/method: 監視方法
+#### Monitor
+- haltp/method: Method
   - softdog
   - keepalive
     ```bash
     $ clpcreate add clsparam haltp/method keepalive
     ```
     
-- haltp/action: タイムアウト発生時動作
+- haltp/action: Operation at Timeout Detection
   - RESET
-  - PANIC (softdog の場合は既定値かつ固定値のためコマンドでは指定不要)
+  - PANIC (If you use softdog as monitor method, PANIC is set automatically. Do not add this tag.)
     ```bash
     $ clpcreate add clsparam haltp/action PANIC
     ```
 
 #### WebManager
-- webmgr/security/clientlist/iprest: クライアントのIPアドレスによって接続を制御する
-  - 0: 制御しない
-  - 1: 制御する
+- webmgr/security/clientlist/iprest: Control connection by using client IP address
+  - 0: Do not control
+  - 1: Control
   ```
   $ clpcreate add clsparam webmgr/security/clientlist/iprest 1
   ```
-  - 制御対象のIPアドレスは、以下で設定してください。 
+  - You can specify the IP address that is allowed to access WebUI by the following command. 
     ```
     $ clpcreate add webmgr clientlist 192.168.100.1
     $ clpcreate add webmgr clientlist 192.168.100.0/24
     ```
 
 ## [Group parameters](#grpparam)
-#### 起動サーバ
-- 起動可能なサーバを個別に設定する場合は、以下のパラメータを設定してください。(デフォルトは全てのサーバでフェイルオーバ可能)
-- policy@\<サーバ名\>/order: 起動可能なサーバと優先順位
-- 優先順位は0が一番高い
+#### Startup Server
+- You can specify the server that the group can start up on. (By default, a group can start up on all servers.)
+- policy@\<server name\>/order: Server and Order
+- Order 0 is the highest.
   ```bash
   $ clpcreate add grpparam failover failover1 policy@server1/order 0
   $ clpcreate add grpparam failover failover1 policy@server2/order 1
   ```
 
 ## [Resource parameters](#rscparam)
-### 共通パラメータ
-#### 復旧動作
-- act/retry: 活性リトライしきい値
-- act/fo: フェイルオーバしきい値
-- act/action: (活性異常検出時の) 最終動作
-- deact/retry: 非活性リトライしきい値
-- deact/action: (非活性異常検出時の) 最終動作
+### Common parameters
+#### Recovery Operation
+- act/retry: Retry Count (at Activation Failure)
+- act/fo: Failover Threshold
+- act/action: Final Action (at Activation Failure)
+- deact/retry: Retry Count at Deactivation Failure
+- deact/action: Final Action (at Dectivation Failure)
   ```bash
   $ clpcreate add rscparam fip fip1 act/retry 1
   $ clpcreate add rscparam fip fip1 act/fo 1
@@ -545,248 +547,251 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   $ clpcreate add rscparam fip fip1 deact/retry 1
   $ clpcreate add rscparam fip fip1 deact/action 5
   ```
-  |数値|最終動作|備考|
+  |Value|Final Action|Note|
   |----|---------|--|
-  |   0|何もしない (次のリソースを活性/非活性する)||
-  |   1|何もしない (次のリソースを活性/非活性しない)||
-  |   2|グループ停止|活性異常検出時のみ指定可能|
-  |   3|クラスタサービス停止||
-  |   4|クラスタサービス停止とOSシャットダウン||
-  |   5|クラスタサービス停止とOS再起動||
-  |   8|sysrqパニック||
-  |   9|keepaliveリセット||
-  |  10|keepaliveパニック||
-  |  11|BMCリセット||
-  |  12|BMCパワーオフ||
-  |  13|BMCパワーサイクル||
+  |   0|No operation (active next resource)||
+  |   1|No operation (not active next resource)||
+  |   2|Stop group|Only when activation failure|
+  |   3|Stop the cluster service||
+  |   4|Stop the cluster service and shutdown OS||
+  |   5|Stop the cluster service and reboot OS||
+  |   8|Sysrq Panic||
+  |   9|Keepalive Reset||
+  |  10|Keepalive Panic||
+  |  11|BMC Reset||
+  |  12|BMC Power Off||
+  |  13|BMC Power Cycle||
   |  14|BMC NMI||
 
-### ディスクリソース (タイプ名: disk)
-- parameters/disktype: ディスクのタイプ
-  - 通常のデバイスをマウントする場合 **disk** を指定してください。
-  - ボリュームグループ (VG) 上の論理ボリューム (LV) をマウントする場合、**lvm** を指定してください。
-- parameters/device: デバイス名
-- parameters/mount/point: マウントポイント
-- parameters/fs: ファイルシステム
-  - ext3, ext4, xfs を指定してください
-- parameters/fsck/timing: Mount実行前のfsckアクション
-  - 0: 実行しない
-  - 1: 必ず実行する
-  - 2: 指定回数に達したら実行する
-- parameters/fsck/interval: Mount実行前のfsckアクションを実行するまでのMount回数
-  - parameters/fsck/timing を 2 に設定した場合にのみ設定してください。
+### Disk resource (type: disk)
+- parameters/disktype: Disk Type
+  - disk: For a normal disk
+  - lvm: For a logical volume on a volume group
+- parameters/device: Device Name
+- parameters/mount/point: Mount Point
+- parameters/fs: File System
+  - ext3, ext4, xfs
+- parameters/fsck/timing: fsck Action Before Mount
+  - 0: Not Execute
+  - 1: Always Execute
+  - 2: Execute at Specified Count
+    - parameters/fsck/interval: Count
 
-### exec リソース (タイプ名: exec)
-- parameters/act/path: Start script のパス
-  - **この製品で作成したスクリプト (既定値)** の場合、**start.sh** を指定してください。
-  - **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/start.sh) を指定してください。
-- parameters/deact/path: Stop script のパス
-  - **この製品で作成したスクリプト (既定値)** の場合、**stop.sh** を指定してください。
-  - **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/stop.sh) を指定してください。
-- parameters/timeout/start: 開始スクリプトのタイムアウト
-- parameters/timeout/stop: 終了スクリプトのタイムアウト
-- parameters/act/sync: 開始スクリプトの同期/非同期
-  - 0: 非同期
-  - 1: 同期
-- parameters/deact/sync: 終了スクリプトの同期/非同期
-  - 0: 非同期
-  - 1: 同期
+### EXEC resource  (type: exec)
+- parameters/act/path: The absolute path to Start script
+  - If you use **Script created with this product**, the value of this tag is **start.sh**.
+  - If you use **User Application**, the value of this tag is arbitrary path (e.g. /opt/test/start.sh)
+- parameters/deact/path: The absolute path to Stop script
+  - If you use **Script created with this product**, the value of this tag is **stop.sh**.
+  - If you use **User Application**, the value of this tag is arbitrary path (e.g. /opt/test/stop.sh)
+- parameters/timeout/start: Timeout (of Start Script)
+- parameters/timeout/stop: Timeout (of Stop Script)
+- parameters/act/sync: Synchronous or Asynchronous (of Start Script)
+  - 0: Asynchronous
+  - 1: Synchronous
+- parameters/deact/sync: Synchronous or Asynchronous (of Stop Script)
+  - 0: Asynchronous
+  - 1: Synchronous
 
-### フローティング IP リソース (タイプ名: fip)
-- parameters/ip: フローティング IP アドレス
-  - インタコネクトと同じサブネットの IP アドレスを指定してください。
+### Floating IP resource (type: fip)
+- parameters/ip: IP Address
+  - Floating IP address should belong to the same subnet with one of heartbeat interconnect.
 
-### ボリュームマネージャリソース (タイプ名: volmgr)
-- parameters/type
-  - LVM を使う場合 **lvm** を指定してください。
-- parameters/devname
-  - LVM を使う場合、VG 名を指定してください。
+### Volume manager resource (type: volmgr)
+- parameters/type: Volume Manager
+  - lvm: For a logical volume on a volume group
+- parameters/devname: Target Name
+  - If you use LVM, please specify the volume group name.
 
 ## [Monitor resource parameters](#monparam)
-### 共通パラメータ
-#### 監視 (共通)
-- polling/interval: 監視処理のインターバル
-- polling/timeout: 監視処理のタイムアウト
-- emergency/dumpcollect/use: タイムアウト発生時に監視プロセスのダンプを採取する
-  - usew, genwでは設定できないことにご注意ください。
-  - 0: 無効
-  - 1: 有効
-- emergency/timeout/notreconfirmation/use: タイムアウト発生時にリトライしない
-  - 0: 無効
-  - 1: 有効
-- emergency/timeout/notrecovery/use: タイムアウト発生時に回復動作を実行しない
-  - 0: 無効
-  - 1: 有効
-- polling/reconfirmation: リトライ回数
+### Common parameters
+#### Monitor(common)
+- polling/interval: Interval
+- polling/timeout: Timeout
+- emergency/dumpcollect/use: Collect the dump file of the monitor process at timeout occurrence
+  - This parameter cannot be used for usew and genw.
+  - 0: Uncheck
+  - 1: Check
+- emergency/timeout/notreconfirmation/use: Do Not Retry at Timieout Occurrence
+  - 0: Uncheck
+  - 1: Check
+- emergency/timeout/notrecovery/use: Do Not Retry at Timieout Occurrence
+  - 0: Uncheck
+  - 1: Check
+- polling/reconfirmation: Retry Count
   ```bash
   $ clpcreate add monparam fipw fipw1 polling/interval 60
   $ clpcreate add monparam fipw fipw1 polling/timeout 120
   $ clpcreate add monparam fipw fipw1 polling/reconfirmation 1
   ```
-- polling/timing: 監視タイミング
-  - 0: 常時
-  - 1: 活性時
-    - 既定値が常時のモニタリソースにおいて、活性時に変更する場合、target も併せて指定してください。
-- target: 監視対象のリソース
-　- polling/timing が 1 の場合 (活性時監視) 、target を設定する必要があります。
-  - polling/timing が 0 の場合 (常時監視) 、設定は不要です。
+- polling/timing: Monitor Timing
+  - 0: Always
+  - 1: Active
+    - If you change a monitor timing from Always to Active, please also specify the target.
+- target: Target Resource
+  - When polling/timing is 0 (Monitor Timing is Always), do not set this parameter.
     ```bash
     $ clpcreate add monparam fipw fipw1 target fip1
     ```
-- firstmonwait: 監視開始待ち時間
-- polling/servers@\<id\>/name: 監視を行うサーバを選択する
-  - 監視を行うサーバが1つの場合、以下のように実行してください。
+- firstmonwait: Wait Time to Start Monitoring
+- polling/servers@\<id\>/name: Choose servers that execute monitoring
+  - If you execute the monitoring on all servers, no need to set this parameter.
+  - The sample command for monitoring on 1 server.
     ```bash
-    $ clpcreate add monparam fipw fipw1 polling/servers@0/name <サーバ名>
+    $ clpcreate add monparam fipw fipw1 polling/servers@0/name <server name>
     ```
-  - 監視を行うサーバが2つ以上の場合、以下のように実行してください。
+  - The sample command for monitoring on 2 or more server.
     ```bash
-    $ clpcreate add monparam fipw fipw1 polling/servers@0/name <サーバ名>
-    $ clpcreate add monparam fipw fipw1 polling/servers@1/name <サーバ名>
+    $ clpcreate add monparam fipw fipw1 polling/servers@0/name <server name>
+    $ clpcreate add monparam fipw fipw1 polling/servers@1/name <server name>
     ```
 
-#### 回復動作
-- カスタム設定のみ対応しています。
-- 適切なパラメータを設定することで、テンプレート(「回復対象を再起動」等)の動作と同様の回復動作を設定することができます。
-  - 回復対象に対してフェイルオーバ実行
+#### Recovery Action
+- Only Custom settings is supported.
+- However by setting appropriate parameters, you can set the same settings with templates (e.g. Execute only the final action)
+  - Executing failover to the recovery target
     ```bash
     $ clpcreate add monparam genw genw1 emergency/threshold/restart 0
     $ clpcreate add monparam genw genw1 emergency/threshold/fo 1
     ```
-  - 回復対象を再起動、効果がなければフェイルオーバ実行
+  - Restart the recovery target, and if there is no effect with restart, then failover
     ```bash
     $ clpcreate add monparam genw genw1 emergency/threshold/restart 1
     $ clpcreate add monparam genw genw1 emergency/threshold/fo 1
     ```
-  - 回復対象を再起動
+  - Restart the recovery target
     ```bash
     $ clpcreate add monparam genw genw1 emergency/threshold/restart 1
     $ clpcreate add monparam genw genw1 emergency/threshold/fo 0
     ```
-  - 最終動作のみ実行
+  - Execute only the final action
     ```bash
     $ clpcreate add monparam genw genw1 emergency/threshold/restart 0
     $ clpcreate add monparam genw genw1 emergency/threshold/fo 0
     ```
-  - カスタム設定
-    - 以降に記載するパラメータから必要なものを設定してください。
-- パラメータの詳細
-- 回復対象
-  - リソースの場合
+  - Custom settings
+    - Please set the following parameters on demand.
+- The detail of parameters
+- Recovery Target
+  - If the target is a resource
     ```bash
-    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/type rsc
-    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/name <リソース名>
+    $ clpcreate add monparam <monitor type> <monitor name> relation/type rsc
+    $ clpcreate add monparam <monitor type> <monitor name> relation/name <resource name>
     ```
-  - グループの場合
+  - If the target is a group
     ```bash
-    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/type grp
-    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/name <フェイルオーバグループ名>
+    $ clpcreate add monparam <monitor type> <monitor name> relation/type grp
+    $ clpcreate add monparam <monitor type> <monitor name> relation/name <group name>
     ```
-  - LocalServer の場合
+  - If the target is LocalServer
     ```bash
-    add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/type cls
-    $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソース名> relation/name LocalServer
+    $ clpcreate add monparam <monitor type> <monitor name> relation/type cls
+    $ clpcreate add monparam <monitor type> <monitor name> relation/name LocalServer
     ```
-- emergency/threshold/script: 回復スクリプト実行回数
-- emergency/preaction/userestart: 再活性前にスクリプトを実行する
-  - 0: 実行しない
-  - 1: 実行する
-- emergency/threshold/restart: 最大再活性回数
+- emergency/threshold/script: Recovery Script Execution Count
+- emergency/preaction/userestart: Execute Script before Reactivation
+  - 0: Uncheck
+  - 1: Check
+- emergency/threshold/restart: Maximum Reactivation Count
   ```bash
   $ clpcreate add monparam genw genw1 emergency/threshold/restart 1
   ```
-- emergency/preaction/usefailover: フェイルオーバ実行前にスクリプトを実行する
-  - 0: 実行しない
-  - 1: 実行する
-- emergency/threshold/fo: 最大フェイルオーバ回数
+- emergency/preaction/usefailover: Execute Script before Failover
+  - 0: Uncheck
+  - 1: Check
+- emergency/threshold/fo: Maximum Failover Count
   ```bash
   $ clpcreate add monparam genw genw1 emergency/threshold/fo 1
   ```
-- emergency/preaction/usefailover: 最終動作前にスクリプトを実行する
-  - 0: 実行しない
-  - 1: 実行する
-- emergency/action: 最終動作
+- emergency/preaction/usefailover: Execute Script before Final Action
+  - 0: Uncheck
+  - 1: Check
+- emergency/action: Final Action
   ```bash
   $ clpcreate add monparam genw genw1 emergency/action 3
   ```
-  |数値|最終動作|
+  |Value|Final Action|
   |----|---------|
-  |   1|何もしない|
-  |   2|グループ停止|
-  |   3|クラスタサービス停止|
-  |   4|クラスタサービス停止とOSシャットダウン|
-  |   5|クラスタサービス停止とOS再起動|
-  |   8|sysrqパニック|
-  |   9|keepaliveリセット|
-  |  10|keepaliveパニック|
-  |  11|BMCリセット|
-  |  12|BMCパワーオフ|
-  |  13|BMCパワーサイクル|
+  |   1|No operation|
+  |   2|Stop group|
+  |   3|Stop the cluster service|
+  |   4|Stop the cluster service and shutdown OS|
+  |   5|Stop the cluster service and reboot OS|
+  |   8|Sysrq Panic
+  |   9|Keepalive Reset|
+  |  10|Keepalive Panic|
+  |  11|BMC Reset|
+  |  12|BMC Power Off|
+  |  13|BMC Power Cycle|
   |  14|BMC NMI|
+  |  15|I/O Fencing(High-End Server Option)|
+  |  16|Stop resource|
 
-- スクリプト設定
-  - emergency/preaction/default: スクリプトのタイプ
-    - 0: ユーザアプリケーション
-    - 1: この製品で作成したスクリプト
-  - emergency/preaction/path: ファイル
-    - ユーザアプリケーションの場合: スクリプトの絶対パス
-    - この製品で作成したスクリプトの場合: preaction.sh
-  - emergency/preaction/timeout: タイムアウト
+- Script Settings
+  - emergency/preaction/default: The type of a script
+    - 0: User Application
+    - 1: Script created with this product
+  - emergency/preaction/path: File
+    - User application: Arbitrary path of the script
+    - Script created with this product: preaction.sh
+  - emergency/preaction/timeout: Timeout
 
 
-### フローティング IP モニタリソース (タイプ名: fipw)
-- parameters/monmii: NIC Link Up/Downを監視する
-  - 0: 監視しない (既定値)
-  - 1: 監視する
+### Floating IP monitor resource (type: fipw)
+- parameters/monmii: Monitor NIC Link Up/Down
+  - 0: Uncheck (Default)
+  - 1: Check
     ```bash
     $ clpcreate add monparam genw genw1 parameters/monmii 1
     ```
 
-### カスタムモニタリソース (タイプ名: genw)
+### Custom monitor resource (type: genw)
 - parameters/path
-  - **この製品で作成したスクリプト** の場合、genw.sh を指定してください。
-  - **ユーザアプリケーション** の場合、任意のパス (e.g. /opt/test/genw.sh) を指定してください。
+  - Script created with this product: genw.sh
+  - User application: Arbitrary path of the script (e.g. /opt/test/genw.sh)
     ```bash
     $ clpcreate add monparam genw genw1 parameters/path genw.sh
     ```
 
-### ディスクモニタリソース (タイプ名: diskw)
-- parameters/object
-  - 監視先のディスクのパスを指定してください。
+### Disk RW monitor resource (type: diskw)
+- parameters/object: Monitor Target
+  - The path of monitored disk
     ```bash
     $ clpcreate add monparam diskw diskw1 parameters/object /dev/sdc2
     ```
 
-### IP モニタリソース (タイプ名: ipw)
-- parameters/list@\<id\>/ip
-  - 監視対象の IPアドレスが1つの場合、以下のように実行してください。
+### IP monitor resource (type: ipw)
+- parameters/list@\<id\>/ip: IP Address List
+  - The sample command for monitoring on 1 IP address.
     ```bash
-    $ clpcreate add monparam ipw ipw1 parameters/list@0/ip <ゲートウェイ の IP アドレス>
+    $ clpcreate add monparam ipw ipw1 parameters/list@0/ip <IP address>
     ```
-  - 複数の IP アドレスを監視対象とする場合、以下のように実行してください。
+  - The sample command for monitoring on multiple IP addresses.
     ```bash
-    $ clpcreate add monparam ipw ipw1 parameters/list@0/ip <ゲートウェイ#1 の IP アドレス>
-    $ clpcreate add monparam ipw ipw1 parameters/list@1/ip <ゲートウェイ#2 の IP アドレス>
+    $ clpcreate add monparam ipw ipw1 parameters/list@0/ip <IP address>
+    $ clpcreate add monparam ipw ipw1 parameters/list@1/ip <IP address>
     ```
 
-### ユーザ空間モニタリソース (タイプ名: userw)
-- parameters/method: 監視方法
-  - keepalive: X 4.x 以降の既定値
-  - softdog: X 3.x までの既定値
+### User mode monitor resource (type: userw)
+- parameters/method: Method
+  - keepalive: The default method since X 4.x
+  - softdog: The default method until X 3.x
     ```bash
     $ clpcreate add monparam userw userw1 parameters/method keepalive
     ```
-- parameters/action: タイムアウト発生時動作
+- parameters/action: Operation at Timeout Detection
   - RESET
-  - PANIC (softdog の場合は既定値かつ固定値のためコマンドでは指定不要)
+  - PANIC
     ```bash
     $ clpcreate add monparam userw userw1 parameters/action PANIC
     ```
-### ボリュームマネージャモニタリソース (タイプ名: volmgrw)
-- parameters/devname: VG 名を指定してください。
+  - If you use softdog as monitoring method, RESET is set automatically. Do not change this parameter.
+
+### Volume manager monitor resource (type: volmgrw)
+- parameters/devname: Target Name
   ```bash
-  $ clpcreate add monparam volmgrw volmgrw parameters/devname <VG 名>
+  $ clpcreate add monparam volmgrw volmgrw parameters/devname <volume group name>
   ```
 
-### PIDモニタリソース (タイプ名: pidw)
-- 固有のパラメータはありません。
+### PID monitor resource (type: pidw)
+- There are no specific parameters.

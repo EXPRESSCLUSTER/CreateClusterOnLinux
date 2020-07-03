@@ -79,7 +79,7 @@ $ clpcreate add clsparam <タグ名> <パラメータ>
 ```bash
 $ clpcreate add srv <サーバ名> <プライオリティ>
 ``` 
-- サーバ名: クラスタのサーバ名を指定してください (e.g. hostname コマンドの実行結果)。
+- サーバ名: クラスタのサーバ名を指定してください (e.g. hostname コマンドの実行結果)。アルファベットは小文字である必要があります。
 - プライオリティ: マスタサーバが 0 になります。以降のサーバは 1 ずつインクリメントしてください。
   - 2 ノード構成 (server1, server2) で、server1 がマスタサーバの場合、server1 のプライオリティが 0、server2 のプライオリティが 1 となります。
 - サンプルスクリプトでは、以下のように設定しています。
@@ -105,13 +105,12 @@ $ clpcreate add srv <サーバ名> <プライオリティ>
 ```bash
 $ clpcreate add ip <サーバ名> <デバイスID> <IPアドレス>
 ```
-- サーバ名: クラスタのサーバ名を指定してください (e.g. hostname コマンドの実行結果)。
+- サーバ名: クラスタのサーバ名を指定してください。
 - デバイスID: 各サーバのIPアドレスのデバイスIDを指定してください。以降のデバイスIDは 1 ずつインクリメントしてください。
   - ユーザモードハートビート、カーネルモードハートビートは 0 から始まります。
     - 例: lanhb1のデバイスIDが0, lankhb1のデバイスIDが1, lanhb2のデバイスIDが2
-  - BMCハートビートは、600 から始まります。
   - デバイスIDはサーバ毎で独立となっています。(デバイスID 0 が複数存在することになる。)
-- IPアドレス: CLUSTERPROで用いるIPアドレスを指定してください。
+- IPアドレス: カーネルモードハートビートやユーザモードハートビートで用いるIPアドレスを指定してください。
 - サンプルスクリプトでは、以下のように設定しています。
   ```perl
   # $ip
@@ -211,7 +210,7 @@ $ clpcreate add diskhbsrv <デバイスID> <ディスクデバイス>
   }
   ```
 
-## ネットワークパーティション解決リソースの追加
+## ネットワークパーティション解決リソース(PING方式)の追加
 ```bash
 $ clpcreate add np ping <プライオリティ> <デバイスID> <グループID> <リストID> <IPアドレス>
 $ clpcreate add npsrv ping <サーバ名> <デバイスID> <使用の有無>
@@ -261,9 +260,10 @@ $ clpcreate add npsrv ping <サーバ名> <デバイスID> <使用の有無>
   
 ## BMCハートビートの追加
 ```bash
-$ clpcreate add bmchb <デバイスID> <プライオリティ>
 $ clpcreate add bmchbsrv <サーバ名> <デバイスID> <IPアドレス>
+$ clpcreate add bmchb <デバイスID> <プライオリティ>
 ```
+- サーバ名: サーバ名を指定してください。
 - デバイスID: IPアドレスのデバイスID 600 以降を指定してください。以降のデバイス ID は1ずつインクリメントしてください。
 - プライオリティ: ハートビートのプライオリティは 0 から指定してください。
 - IPアドレス: BMCハートビートで用いるIPアドレスを指定してください。
@@ -342,7 +342,7 @@ $ clpcreate add rscparam <リソースのタイプ名> <リソース名> <タグ
 $ clpcreate add rscdep <依存されるリソース名> <依存するリソース名>
 ```
 - グループの起動時、依存されるリソースの起動後、依存するリソースを起動します。
-- グループの停止時、依存するリソースの起動後、依存されるリソースを停止します。
+- グループの停止時、依存するリソースの停止後、依存されるリソースを停止します。
 - サンプルスクリプトでは、以下のように設定しています。
   ```perl
   my $rscdepend =
@@ -473,6 +473,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   |  14|BMC NMI||
   |  15|I/O-Fencing(High-End Server Option)||
 
+#### NP解決
 - cluster/networkpartition/npaction: NP発生時動作
   ```bash
   $ clpcreate add clsparam cluster/networkpartiton/npaction 6
@@ -713,6 +714,7 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
     ```
 - firstmonwait: 監視開始待ち時間
 - polling/servers@\<id\>/name: 監視を行うサーバを選択する
+  - 規定値である全てのサーバで監視を行う場合は、設定する必要はありません。
   - 監視を行うサーバが1つの場合、以下のように実行してください。
     ```bash
     $ clpcreate add monparam fipw fipw1 polling/servers@0/name <サーバ名>
@@ -802,6 +804,8 @@ $ clpcreate add monparam <モニタリソースのタイプ名> <モニタリソ
   |  12|BMCパワーオフ|
   |  13|BMCパワーサイクル|
   |  14|BMC NMI|
+  |  15|I/O Fencing(High-End Server Option)|
+  |  16|リソース停止|
 
 - スクリプト設定
   - emergency/preaction/default: スクリプトのタイプ
