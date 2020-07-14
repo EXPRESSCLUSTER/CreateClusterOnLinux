@@ -33,12 +33,51 @@ reboot等のOSコマンドで両サーバを再起動します。
 
 clpcreateコマンドを用いてクラスタ構成情報(clp.conf)を作成します。
 - Linuxクラスタのパラメータ一覧
-  
-  https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/CommandParameters_jp.md
+  - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/CommandParameters_jp.md
+- サンプルスクリプト
+  - 共有ディスク
+    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/src/create_lin_sd.pl
+  - 共有ディスク (LVM利用)
+    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/src/create_lin_sd_lvm.pl
 
 ## クラスタ用スクリプトの配置
+構築予定のクラスタにて、EXECリソースまたはカスタムモニタリソースを利用される場合には、それらに含まれるスクリプトを以下のように配置してください。
+```
+clp.conf
+scripts/
+ |
+ +-- フェイルオーバグループ名/ 
+ |    |
+ |    +-- EXEC リソース名/ 
+ |         |
+ |         +-- start.sh
+ |         |
+ |         +-- stop.sh
+ |
+ +-- monitor.s/
+      |
+      +-- カスタムモニタリソース名/
+           |
+           +-- genw.sh
 
-構築予定のクラスタがスクリプトを含む場合は、スクリプトをクラスタ構成情報で指定したパスに事前に配置してください。
+E.g.
+clp.conf
+scripts/
+ |
+ +-- failover/ 
+ |    |
+ |    +-- exec/ 
+ |         |
+ |         +-- start.sh
+ |         |
+ |         +-- stop.sh
+ |
+ +-- monitor.s/
+      |
+      +-- genw/
+           |
+           +-- genw.sh
+```
 
 ## クラスタ構成情報の配信
 
