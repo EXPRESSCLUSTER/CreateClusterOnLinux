@@ -33,7 +33,7 @@ reboot等のOSコマンドで両サーバを再起動します。
 
 clpcreateコマンドを用いてクラスタ構成情報(clp.conf)を作成します。
 - Linuxクラスタのパラメータ一覧
-  - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/CommandParameters_jp.md
+  - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/CommandParameters_Linux_jp.md
 - サンプルスクリプト
   - 共有ディスク
     - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/src/create_lin_sd.pl
