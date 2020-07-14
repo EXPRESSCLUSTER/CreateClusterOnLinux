@@ -87,7 +87,7 @@ main(
 		{
 			if (!strcmp(argv[3], "disk"))
 			{
-				add_disknp(argv[4], argv[5], argv[6]);
+				add_disknp(argv[4], argv[5]);
 			}
 			else if (!strcmp(argv[3], "ping"))
 			{
@@ -983,25 +983,33 @@ func_exit:
  */
 int
 add_disknp(
-	char* npname, 
 	char* priority, 
 	char* device
 )
 {
 	char 	path[CONF_PATH_LEN];
 	int 	ret;
+	char	dev_number[16];
+	int		i;
 
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
 
-	sprintf(path, "/root/networkpartition/types@disknp/disknp@%s/priority", npname);
+	i = atoi(device) - 10100;
+	i++;
+	sprintf(dev_number, "%d", i);
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	sprintf(path, "/root/networkpartition/types@disknp/disknp@disknp%s/priority", dev_number);
 	ret = set_value(g_doc, path, priority);
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);
 		ret = CONF_ERR_FILE;
 	}
-	sprintf(path, "/root/networkpartition/types@disknp/disknp@%s/device", npname);
+	sprintf(path, "/root/networkpartition/types@disknp/disknp@disknp%s/device", dev_number);
 	ret = set_value(g_doc, path, device);
 	if (ret)
 	{
