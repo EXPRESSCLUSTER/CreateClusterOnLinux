@@ -33,12 +33,12 @@ reboot等のOSコマンドで両サーバを再起動します。
 
 clpcreateコマンドを用いてクラスタ構成情報(clp.conf)を作成します。
 - Linuxクラスタのパラメータ一覧
-  - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/CommandParameters_Linux_jp.md
+  - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/doc/jp/CommandUsage_v2_Linux_jp.md
 - サンプルスクリプト
-  - 共有ディスク
-    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/src/create_lin_sd.pl
-  - 共有ディスク (LVM利用)
-    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/src/create_lin_sd_lvm.pl
+  - 共有ディスク (PING方式NP解決リソース)
+    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/template_scripts/clpcreate_v2/create_lin_disk_pingnp.pl
+  - 共有ディスク (Witnessハートビート & HTTP方式NP解決リソース)
+    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/template_scripts/clpcreate_v2/create_lin_disk_witnesshb_httpnp.pl
 
 ## クラスタ用スクリプトの配置
 構築予定のクラスタにて、EXECリソースまたはカスタムモニタリソースを利用される場合には、それらに含まれるスクリプトを以下のように配置してください。
