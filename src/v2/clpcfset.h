@@ -23,7 +23,7 @@ xmlNodePtr find_value_node(xmlDocPtr doc, xmlNodePtr node, char *path, char *cur
 xmlNodePtr find_child_node(xmlDocPtr doc, xmlNodePtr node, char *element, char *attribute);
 xmlNodePtr make_child_node(xmlNodePtr node, char *node_name, char *attr_var);
 
-//clpcreate.c
+//clpcfset.c
 int add_cls(char *clsname, char *charset, char *encode, char *os);
 int add_srv(char *srvname, char *priority);
 int add_hba(char *srvname, char *id, char *tag, char *param);

@@ -1,16 +1,16 @@
 .PHONY: all
-all: clpcreate clean
+all: clpcfset clean
 
-clpcreate: clpcreate.o clpconfin.o
-	cc -I /usr/include/libxml2 -o clpcreate clpcreate.o clpconfin.o -lxml2
-clpcreate.o: clpcreate.c
-	cc -I /usr/include/libxml2 -c clpcreate.c -lxml2
+clpcfset: clpcfset.o clpconfin.o
+	cc -I /usr/include/libxml2 -o clpcfset clpcfset.o clpconfin.o -lxml2
+clpcfset.o: clpcfset.c
+	cc -I /usr/include/libxml2 -c clpcfset.c -lxml2
 clpconfin.o: clpconfin.c
 	cc -I /usr/include/libxml2 -c clpconfin.c -lxml2
 
-clpcreate.o: clpcreate.h
-clpconfin.o: clpcreate.h
+clpcfset.o: clpcfset.h
+clpconfin.o: clpcfset.h
 
 .PHONY: clean
 clean:
-	rm -f clpcreate.o clpconfin.o
+	rm -f clpcfset.o clpconfin.o

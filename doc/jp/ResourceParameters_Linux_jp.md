@@ -1,6 +1,7 @@
 # Resource Parameters for Linux cluster
 - リソースパラメータの詳細について説明しています。
 - **(default)** と記載された設定値を利用する場合は、コマンドでパラメータを設定する必要はありません。
+- **ver1**を使用する場合は、コマンド例の**clpcfset**を**clpcreate**に置き換えてください。
 - 各パラメータに入力可能な文字列や禁則文字列については、CLUSTERPRO のリファレンスガイドを参照してください。
 
 ## 目次
@@ -18,11 +19,11 @@
 - deact/retry: 非活性リトライしきい値
 - deact/action: (非活性異常検出時の) 最終動作
   ```bash
-  $ clpcreate add rscparam fip fip1 act/retry 1
-  $ clpcreate add rscparam fip fip1 act/fo 1
-  $ clpcreate add rscparam fip fip1 act/action 2
-  $ clpcreate add rscparam fip fip1 deact/retry 1
-  $ clpcreate add rscparam fip fip1 deact/action 5
+  $ clpcfset add rscparam fip fip1 act/retry 1
+  $ clpcfset add rscparam fip fip1 act/fo 1
+  $ clpcfset add rscparam fip fip1 act/action 2
+  $ clpcfset add rscparam fip fip1 deact/retry 1
+  $ clpcfset add rscparam fip fip1 deact/action 5
   ```
   |数値|最終動作|備考|
   |----|---------|--|

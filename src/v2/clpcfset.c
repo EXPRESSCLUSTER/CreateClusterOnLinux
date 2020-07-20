@@ -5,7 +5,7 @@
 #include <libxml/tree.h>
 #include <libxml/parser.h>
 
-#include "clpcreate.h"
+#include "clpcfset.h"
 
 static xmlDocPtr	g_doc = NULL;
 static char			*g_encoding[16];
@@ -24,9 +24,9 @@ main(
 	int			ret;
 	char		obj_num[16];
 
-	if (!strcmp(argv[1], "init"))
+	if (!strcmp(argv[1], "create"))
 	{
-		init(argv[2]);
+		init(argv[3]);
 	}
 	else if (strcmp(argv[1], "add") & strcmp(argv[1], "rpl") & strcmp(argv[1], "rmv"))
 	{
@@ -37,13 +37,13 @@ main(
 	g_doc = xmlParseFile("clp.conf");
 	strcpy(g_encoding, g_doc->encoding);
 
-	if (!strcmp(argv[1], "add"))
+	if (!strcmp(argv[1], "create"))
 	{
-		if (!strcmp(argv[2], "cls"))
-		{
-			add_cls(argv[3], argv[4], argv[5], argv[6]);
-		}
-		else if (!strcmp(argv[2], "srv"))
+		add_cls(argv[2], argv[3], argv[4], argv[5]);
+	}
+	else if (!strcmp(argv[1], "add"))
+	{
+		if (!strcmp(argv[2], "srv"))
 		{
 			add_srv(argv[3], argv[4]);
 		}

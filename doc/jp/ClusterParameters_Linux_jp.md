@@ -1,6 +1,7 @@
 # Cluster Parameters for Linux cluster
 - クラスタパラメータの詳細について説明しています。
 - **(default)** と記載された設定値を利用する場合は、コマンドでパラメータを設定する必要はありません。
+- **ver1**を使用する場合は、コマンド例の**clpcfset**を**clpcreate**に置き換えてください。
 - 各パラメータに入力可能な文字列や禁則文字列については、CLUSTERPRO のリファレンスガイドを参照してください。
 
 ## 目次
@@ -15,9 +16,9 @@
 - pm/exec2/recover
   - 上記 3 つのパス全てに同じ値を設定してください。
     ```bash
-    $ clpcreate add clsparam pm/exec0/recover 7
-    $ clpcreate add clsparam pm/exec1/recover 7
-    $ clpcreate add clsparam pm/exec2/recover 7
+    $ clpcfset add clsparam pm/exec0/recover 7
+    $ clpcfset add clsparam pm/exec1/recover 7
+    $ clpcfset add clsparam pm/exec2/recover 7
     ```
   |数値|最終動作|備考|
   |----|---------|--|
@@ -34,7 +35,7 @@
 
 - cluster/rsctimeout/rsctoaction: グループリソースの活性/非活性ストール発生時動作
   ```bash
-  $ clpcreate add clsparam cluster/rsctimeout/rsctoaction 0
+  $ clpcfset add clsparam cluster/rsctimeout/rsctoaction 0
   ```
   |数値|最終動作|備考|
   |----|---------|--|
@@ -53,7 +54,7 @@
 ## NP解決
 - cluster/networkpartition/npaction: NP発生時動作
   ```bash
-  $ clpcreate add clsparam cluster/networkpartiton/npaction 6
+  $ clpcfset add clsparam cluster/networkpartiton/npaction 6
   ```
   |数値|最終動作|備考|
   |----|---------|--|
@@ -78,14 +79,14 @@
   - ipmi(High-End Server Option)
   - keepalive **(default)**
     ```bash
-    $ clpcreate add clsparam haltp/method keepalive
+    $ clpcfset add clsparam haltp/method keepalive
     ```
     
 - haltp/action: タイムアウト発生時動作
   - RESET **(default)**
   - PANIC (softdog の場合は既定値かつ固定値のためコマンドでは指定不要)
     ```bash
-    $ clpcreate add clsparam haltp/action PANIC
+    $ clpcfset add clsparam haltp/action PANIC
     ```
 
 - cluster/sysinfo/collect: システムリソース情報を収集する
@@ -97,10 +98,10 @@
   - 0: チェックしない **(default)**
   - 1: チェックする
     ```
-    $ clpcreate add clsparam webmgr/security/clientlist/iprest 1
+    $ clpcfset add clsparam webmgr/security/clientlist/iprest 1
     ```
   - 制御対象のIPアドレスは、以下で設定してください。 
     ```
-    $ clpcreate add webmgr clientlist 192.168.100.1
-    $ clpcreate add webmgr clientlist 192.168.200.0/24
+    $ clpcfset add webmgr clientlist 192.168.100.1
+    $ clpcfset add webmgr clientlist 192.168.200.0/24
     ```

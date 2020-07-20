@@ -25,18 +25,18 @@ use warnings;
 #-------------------------------------------------
 # Parameters
 #-------------------------------------------------
-# $clpcreate
-#  Set the relative path for clpcreate.
-my $clpcreate = './clpcreate';
+# $clpcfset
+#  Set the relative path for clpcfset.
+my $clpcfset = './clpcfset';
 #
 # %cluster
-#  charset:
+#  encode:
 #    This parameter depends on the language of CLUSTERPRO
 #    Japanese: EUC-JP
 #    English : ASCII
 #    Chinese : GB2312
-#  encode:
-#    This parameter depends on the language of a server that you use to access WebUI
+#  webui:
+#    This parameter depends on the language of a server on which you create a clp.conf on WebUI
 #    If you use WebUI on Windows machine
 #      SJIS
 #    If you use WebUI on Linux macine
@@ -45,7 +45,7 @@ my $clpcreate = './clpcreate';
 #      GB2312: Chinese
 #  os:
 #   windows or linux
-my %cluster = (name=>'cluster', charset=>'EUC-JP', encode=>'EUC-JP', os=>'linux');
+my %cluster = (name=>'cluster', encode=>'EUC-JP', webui=>'EUC-JP', os=>'linux');
 # $cluster_param
 #  tag, parameter
 my $cluster_param =
@@ -154,24 +154,22 @@ my $ret = 0;
 my $i = 0;
 my $j = 0;
 my $k = 0;
-# initialize
-$ret = `$clpcreate init $cluster{'charset'}`;
 
-# add a cluster
-$ret = `$clpcreate add cls $cluster{'name'} $cluster{'charset'} $cluster{'encode'} $cluster{'os'}`;
+# create a cluster
+$ret = `$clpcfset create $cluster{'name'} $cluster{'encode'} $cluster{'webui'} $cluster{'os'}`;
 
 # add cluster parameters
 for ($i = 0; $i < scalar(@$cluster_param); $i++)
 {
     next if (scalar(@{$cluster_param->[$i]}) == 0);
-    $ret = `$clpcreate add clsparam $cluster_param->[$i][0] $cluster_param->[$i][1]`;
+    $ret = `$clpcfset add clsparam $cluster_param->[$i][0] $cluster_param->[$i][1]`;
 }
 
 # add servers
 for ($i = 0; $i < scalar(@$server); $i++)
 {
     next if (scalar(@{$server->[$i]}) == 0);
-    $ret = `$clpcreate add srv $server->[$i][0] $i`;
+    $ret = `$clpcfset add srv $server->[$i][0] $i`;
 }
 
 # add devices
@@ -182,11 +180,11 @@ for ($i = 0; $i < scalar(@$server); $i++)
     {
         if (scalar(@{$device->[$i][$j]}) == 3)
         {
-            $ret = `$clpcreate add device $server->[$i][0] $device->[$i][$j][0] $device->[$i][$j][1] $device->[$i][$j][2]`;
+            $ret = `$clpcfset add device $server->[$i][0] $device->[$i][$j][0] $device->[$i][$j][1] $device->[$i][$j][2]`;
         }
         elsif(scalar(@{$device->[$i][$j]}) == 4)
         {
-            $ret = `$clpcreate add device $server->[$i][0] $device->[$i][$j][0] $device->[$i][$j][1] $device->[$i][$j][2] $device->[$i][$j][3]`;
+            $ret = `$clpcfset add device $server->[$i][0] $device->[$i][$j][0] $device->[$i][$j][1] $device->[$i][$j][2] $device->[$i][$j][3]`;
         } 
     }
 }
@@ -195,7 +193,7 @@ for ($i = 0; $i < scalar(@$server); $i++)
 for ($i = 0; $i < scalar(@$hb); $i++)
 {
     next if (scalar(@{$hb->[$i]}) == 0);
-    $ret = `$clpcreate add hb $hb->[$i][0] $hb->[$i][1] $hb->[$i][2]`;
+    $ret = `$clpcfset add hb $hb->[$i][0] $hb->[$i][1] $hb->[$i][2]`;
 }
 
 # add ping NP resolution resources
@@ -205,7 +203,7 @@ for ($i = 0; $i < scalar(@$pingnp); $i++)
     for ($j = 4; $j < scalar(@{$pingnp->[$i]}); $j++)
     {
         next if (scalar(@{$pingnp->[$i][$j]}) == 0);
-        $ret = `$clpcreate add np $pingnp->[$i][0] $pingnp->[$i][1] $pingnp->[$i][2] $pingnp->[$i][3] $pingnp->[$i][$j][0] $pingnp->[$i][$j][1]`;
+        $ret = `$clpcfset add np $pingnp->[$i][0] $pingnp->[$i][1] $pingnp->[$i][2] $pingnp->[$i][3] $pingnp->[$i][$j][0] $pingnp->[$i][$j][1]`;
     }
 }
 
@@ -213,7 +211,7 @@ for ($i = 0; $i < scalar(@$pingnp); $i++)
 for ($i = 0; $i < scalar(@$group); $i++)
 {
     next if (scalar(@{$group->[$i]}) == 0);
-    $ret = `$clpcreate add grp failover $group->[$i][0]`;
+    $ret = `$clpcfset add grp failover $group->[$i][0]`;
 }
 
 # add resources
@@ -223,10 +221,10 @@ for ($i = 0; $i < scalar(@$resource); $i++)
     for ($j = 0; $j < scalar(@{$resource->[$i]}); $j++)
     {
         next if (scalar(@{$resource->[$i]->[$j]}) == 0);
-        $ret = `$clpcreate add rsc $group->[$i][0] $resource->[$i][$j][0] $resource->[$i][$j][1]`;
+        $ret = `$clpcfset add rsc $group->[$i][0] $resource->[$i][$j][0] $resource->[$i][$j][1]`;
         for ($k = 2; $k < scalar(@{$resource->[$i]->[$j]}); $k++)
         {
-            $ret = `$clpcreate add rscparam $resource->[$i][$j][0] $resource->[$i][$j][1] $resource->[$i][$j][$k][0] $resource->[$i][$j][$k][1]`;
+            $ret = `$clpcfset add rscparam $resource->[$i][$j][0] $resource->[$i][$j][1] $resource->[$i][$j][$k][0] $resource->[$i][$j][$k][1]`;
         }
     }
 }
@@ -243,7 +241,7 @@ for ($i = 0; $i < scalar(@$rscdepend); $i++)
             next if (scalar(@{$resource->[$j][$k]}) == 0);
             if ($resource->[$j][$k][1] eq $rscdepend->[$i][1])
             {
-                $ret = `$clpcreate add rscdep $resource->[$j][$k][0] $resource->[$j][$k][1] $rscdepend->[$i][0]`;
+                $ret = `$clpcfset add rscdep $resource->[$j][$k][0] $resource->[$j][$k][1] $rscdepend->[$i][0]`;
             }
         }
     }
@@ -253,10 +251,10 @@ for ($i = 0; $i < scalar(@$rscdepend); $i++)
 for ($i = 0; $i < scalar(@$monitor); $i++)
 {
     next if (scalar(@{$monitor->[$i]}) == 0);
-    $ret = `$clpcreate add mon $monitor->[$i][0] $monitor->[$i][1]`;
+    $ret = `$clpcfset add mon $monitor->[$i][0] $monitor->[$i][1]`;
     for ($j = 2; $j < scalar(@{$monitor->[$i]}); $j++)
     {
-        $ret = `$clpcreate add monparam $monitor->[$i][0] $monitor->[$i][1] $monitor->[$i][$j][0] $monitor->[$i][$j][1]`;
+        $ret = `$clpcfset add monparam $monitor->[$i][0] $monitor->[$i][1] $monitor->[$i][$j][0] $monitor->[$i][$j][1]`;
     }
 }
 
@@ -302,7 +300,7 @@ for ($i = 0; $i < scalar(@$monitor); $i++)
 #}
 
 #my $objnum = $srvnum + ($srvnum * ($hbnum + $diskhbnum + $npnum)) + $grpnum + $rscnum + $monnum + 4;
-#$ret = `$clpcreate add objnum $objnum`;
+#$ret = `$clpcfset add objnum $objnum`;
 
 $ret = `xmllint --format --output clp.conf clp.conf`
 

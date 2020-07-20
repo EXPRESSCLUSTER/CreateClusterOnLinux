@@ -6,7 +6,7 @@
 #include <libxml/parser.h>
 #include <libxml/xmlstring.h>
 
-#include "clpcreate.h"
+#include "clpcfset.h"
 
 int child_hit_flag;
 extern int	g_webmgr;

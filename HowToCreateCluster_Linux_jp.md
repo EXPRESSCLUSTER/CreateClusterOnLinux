@@ -1,5 +1,5 @@
 # CLIでLinuxクラスタを作成する方法
-clpcreateコマンドを用いてCLIベースでLinuxクラスタを作成する方法について説明しています。
+CLIベースでLinuxクラスタを作成する方法について説明しています。
 
 ## 目次
 - [CLUSTERPROのインストール](#CLUSTERPROのインストール)
@@ -31,7 +31,7 @@ reboot等のOSコマンドで両サーバを再起動します。
 
 ## クラスタ構成情報の作成
 
-clpcreateコマンドを用いてクラスタ構成情報(clp.conf)を作成します。
+コマンドを用いてクラスタ構成情報(clp.conf)を作成します。
 - Linuxクラスタのパラメータ一覧
   - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/doc/jp/CommandUsage_v2_Linux_jp.md
 - サンプルスクリプト
