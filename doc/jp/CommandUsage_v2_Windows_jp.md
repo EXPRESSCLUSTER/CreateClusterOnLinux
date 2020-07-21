@@ -55,7 +55,15 @@ $ clpcfset add srv <サーバ名> <プライオリティ>
   - 2 ノード構成 (server1, server2) で、server1 がマスタサーバの場合、server1 のプライオリティが 0、server2 のプライオリティが 1 となります。
 
 ## HBAの追加
-- 作成中
+```bash
+$ clpcfset add hba <サーバ名> <HBA ID> <portnumber> <deviceid> <instanceid>
+```
+- サーバ名: クラスタのサーバ名を指定してください。
+- HBA ID: 初期値は0です。以降は1ずつ増えていきます。
+- portnumber, deviceid, instanceid
+  - HBA の情報を指定してください。
+  - 以下のレポジトリで提供されている clpdiskctrl.exe を用いて HBA の情報を取得することができます。
+    - https://github.com/EXPRESSCLUSTER/ControlDisk
 
 ## デバイスの追加
 - ハートビートやネットワークパーティション解決リソースを追加する前に、対応するデバイスを追加する必要があります。
@@ -68,8 +76,8 @@ $ clpcfset add device <サーバ名> <デバイスのタイプ> <デバイスID>
   - BMCハートビート: bmc
   - Witnessハートビート: witness
   - ディスク方式NP解決リソース: disknp
-  - PING方式NP解決リソース: pingnp
-  - HTTP方式NP解決リソース: httpnp
+  - PING方式NP解決リソース: ping
+  - HTTP方式NP解決リソース: http
 - デバイスID: 以下の値から始まり、追加する毎に1ずつ増えていきます。各サーバに同じデバイスIDのデバイスを設定してください。
   - カーネルモードハートビート: 0
   - ディスクハートビート: 300
@@ -83,6 +91,8 @@ $ clpcfset add device <サーバ名> <デバイスのタイプ> <デバイスID>
   - BMCハートビート: IPアドレス
   - Witnessハートビート: 0 (使用しない) / 1 (使用する)
   - ディスク方式NP解決リソース: GUID
+      - 以下のレポジトリで提供されている clpdiskctrl.exe を用いて GUID を取得することができます。
+        - https://github.com/EXPRESSCLUSTER/ControlDisk
   - PING方式NP解決リソース: 0 (使用しない) / 1 (使用する)
   - HTTP方式NP解決リソース: 0 (使用しない) / 1 (使用する)
 - extend:

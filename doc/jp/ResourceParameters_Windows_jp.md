@@ -40,6 +40,8 @@
   - ドライブ文字をアルファベット一文字で指定してください。
 - server@<サーバ名>/parameters/volumeguid: 起動可能サーバのGUID
   - 両サーバについて指定してください。
+  - 以下のレポジトリで提供されている clpdiskctrl.exe を用いて GUID を取得することができます。
+    - https://github.com/EXPRESSCLUSTER/ControlDisk
 
 ## スクリプトリソース
 ### タイプ名: script
