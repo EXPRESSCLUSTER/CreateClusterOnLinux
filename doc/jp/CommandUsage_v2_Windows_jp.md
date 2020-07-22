@@ -2,10 +2,14 @@
 - clpcfset コマンド **(ver2)** の使用法について説明しています。
 - 各パラメータに入力可能な文字列や禁則文字列については、CLUSTERPRO のリファレンスガイドを参照してください。
 
+## 注意
+- SANブート構成にはまだ対応しておりません。
+
 ## 目次
 - [クラスタの作成](#クラスタの作成)
 - [サーバの追加](#サーバの追加)
-- [HBAの追加](#HBAの追加)- [デバイスの追加](#デバイスの追加)
+- [HBAの追加](#HBAの追加)
+- [デバイスの追加](#デバイスの追加)
 - [カーネルモードハートビートの追加](#カーネルモードハートビートの追加)
 - [BMCハートビートの追加](#BMCハートビートの追加)
 - [Witnessハートビートの追加](#Witnessハートビートの追加)
@@ -40,12 +44,6 @@ $ clpcfset add clsparam <タグ名> <パラメータ>
 ```
 - タグ名、パラメータについては、[クラスタのパラメータ](https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/doc/jp/ClusterParameters_Linux_jp.md)を参照してください。
 
-```bash
-# クラスタのパラメータの追加
-$ clpcfset add clsparam <タグ名> <パラメータ>
-```
-- タグ名、パラメータについては、[クラスタのパラメータ](https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/doc/jp/ClusterParameters_Linux_jp.md)を参照してください。
-
 ## サーバの追加
 ```bash
 $ clpcfset add srv <サーバ名> <プライオリティ>
@@ -62,6 +60,7 @@ $ clpcfset add hba <サーバ名> <HBA ID> <portnumber> <deviceid> <instanceid>
 - HBA ID: 初期値は0です。以降は1ずつ増えていきます。
 - portnumber, deviceid, instanceid
   - HBA の情報を指定してください。
+    - バックスラッシュを含む際はエスケープにご注意ください。
   - 以下のレポジトリで提供されている clpdiskctrl.exe を用いて HBA の情報を取得することができます。
     - https://github.com/EXPRESSCLUSTER/ControlDisk
 
@@ -98,6 +97,7 @@ $ clpcfset add device <サーバ名> <デバイスのタイプ> <デバイスID>
 - extend:
   - Witnessハートビート: Witnessサーバの ホストアドレス:ポート番号
   - ディスク方式NP解決リソース: ドライブレター (例: F:\\)
+    - バックスラッシュのエスケープにご注意ください。
   - HTTP方式NP解決リソース: 接続先の ホストアドレス:ポート番号
 
 ## カーネルモードハートビートの追加

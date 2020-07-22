@@ -1,4 +1,4 @@
-# Command Parameters for Windows cluster
+# Command Usage for Windows cluster
 - clpcreate コマンド **(ver1)** の使用法について説明しています。
 - 各パラメータに入力可能な文字列や禁則文字列については、CLUSTERPRO のリファレンスガイドを参照してください。
 
@@ -55,7 +55,19 @@ $ clpcreate add srv <サーバ名> <プライオリティ>
   - 2 ノード構成 (server1, server2) で、server1 がマスタサーバの場合、server1 のプライオリティが 0、server2 のプライオリティが 1 となります。
 
 ## HBAの追加
-- 作成中
+```bash
+$ clpcreate add hba <サーバ名> <HBA ID> <タグ> <パラメータ>
+```
+- サーバ名: クラスタのサーバ名を指定してください。
+- HBA ID: 初期値は0です。以降は1ずつ増えていきます。
+- タグ: 以下の値を指定してください。
+  - portnumber
+  - deviceid
+  - instanceid
+- パラメータ:
+  - バックスラッシュを含む際はエスケープにご注意ください。
+  - 以下のレポジトリで提供されている clpdiskctrl.exe を用いて HBA の情報 (portnumber, deviceid, instanceid) を取得することができます。
+    - https://github.com/EXPRESSCLUSTER/ControlDisk
 
 ## IPアドレスの追加
 ```bash
@@ -102,6 +114,8 @@ $ clpcreate add np disk <プライオリティ> <デバイスID>
 - サーバ名: サーバ名を指定してください。
 - デバイスID: NP解決リソースのデバイスIDを 10100 から指定してください。以降のデバイスは 1 ずつインクリメントしてください。
 - GUID: GUIDを指定してください。
+  - 以下のレポジトリで提供されている clpdiskctrl.exe を用いて GUID を取得することができます。
+    - https://github.com/EXPRESSCLUSTER/ControlDisk
 - ドライブレター: ドライブレターを指定してください。(例: F:\\)
 - プライオリティ: NP解決リソースのプライオリティは 0 から指定してください。
 

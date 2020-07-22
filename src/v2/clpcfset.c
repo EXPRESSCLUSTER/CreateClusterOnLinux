@@ -49,7 +49,7 @@ main(
 		}
 		else if (!strcmp(argv[2], "hba"))
 		{
-			add_hba(argv[3], argv[4], argv[5], argv[6]);
+			add_hba(argv[3], argv[4], argv[5], argv[6], argv[7]);
 		}
 		else if (!strcmp(argv[2], "device"))
 		{
@@ -274,8 +274,9 @@ int
 add_hba(
 	char *srvname,
 	char *id,
-	char *tag,
-	char *param
+	char *port,
+	char *device,
+	char *instance
 )
 {
 	char	path[CONF_PATH_LEN];
@@ -284,8 +285,22 @@ add_hba(
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
 
-	sprintf(path, "/root/server@%s/hba@%s/%s", srvname, id, tag);
-	ret = set_value(g_doc, path, param);
+	sprintf(path, "/root/server@%s/hba@%s/portnumber", srvname, id);
+	ret = set_value(g_doc, path, port);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/hba@%s/deviceid", srvname, id);
+	ret = set_value(g_doc, path, device);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/hba@%s/instanceid", srvname, id);
+	ret = set_value(g_doc, path, instance);
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);

@@ -1,4 +1,4 @@
-# Command Parameters for Linux cluster
+# Command Usage for Linux cluster
 - clpcreate コマンド **(ver1)** の使用法について説明しています。
 - 各パラメータに入力可能な文字列や禁則文字列については、CLUSTERPRO のリファレンスガイドを参照してください。
 

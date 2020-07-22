@@ -26,7 +26,7 @@ xmlNodePtr make_child_node(xmlNodePtr node, char *node_name, char *attr_var);
 //clpcfset.c
 int add_cls(char *clsname, char *charset, char *encode, char *os);
 int add_srv(char *srvname, char *priority);
-int add_hba(char *srvname, char *id, char *tag, char *param);
+int add_hba(char *srvname, char *id, char *port, char *device, char *instance);
 int add_dev_lan(char *srvname, char *id, char *ipaddr);
 int add_dev_mdc(char *srvname, char *id, char *info);
 int add_dev_diskhb(char *srvname, char *id, char *info);

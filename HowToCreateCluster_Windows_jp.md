@@ -40,13 +40,13 @@ reboot等のOSコマンドで両サーバを再起動します。
 ## クラスタ構成情報の作成
 
 コマンドを用いてクラスタ構成情報(clp.conf)を作成します。
-- Linuxクラスタのパラメータ一覧
+- Windowsクラスタのパラメータ一覧
   - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/doc/jp/CommandUsage_v2_Windows_jp.md
 - サンプルスクリプト
   - 共有ディスク (PING方式NP解決リソース)
-    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/template_scripts/clpcreate_v2/
+    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/template_scripts/clpcreate_v2/create_win_disk_pingnp.pl
   - 共有ディスク (Witnessハートビート & HTTP方式NP解決リソース)
-    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/template_scripts/clpcreate_v2/
+    - https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/template_scripts/clpcreate_v2/create_win_disk_witnesshb_httpnp.pl
 
 ## クラスタ用スクリプトの配置
 構築予定のクラスタにて、スクリプトリソースまたはカスタムモニタリソースを利用される場合には、それらに含まれるスクリプトを以下のように配置してください。
