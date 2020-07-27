@@ -9,6 +9,7 @@
 - [NP解決](#NP解決)
 - [監視](#監視)
 - [WebManager](#WebManager)
+- [アカウント](#アカウント)
 
 ## リカバリ
 - pm/exec0/recover: クラスタサービスのプロセス異常時動作
@@ -80,3 +81,9 @@
     $ clpcfset add webmgr clientlist 192.168.100.1
     $ clpcfset add webmgr clientlist 192.168.200.0/24
     ```
+
+## アカウント
+- cluster/account/list@<ユーザID>/username: ユーザ名
+  - ユーザIDは0から始まります。その後、追加するたびに1ずつ増えていきます。
+- cluster/account/list@<ユーザID>/password: パスワード
+  - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。

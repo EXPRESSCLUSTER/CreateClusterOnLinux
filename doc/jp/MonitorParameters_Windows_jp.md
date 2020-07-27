@@ -6,14 +6,17 @@
 
 ## 目次
 - [共通パラメータ](#共通パラメータ)
-- [フローティングIPモニタリソース](#フローティングIPモニタリソース)
-- [カスタムモニタリソース](#カスタムモニタリソース)
-- [ディスクTURモニタリソース](#ディスクモニタリソース)
-- [ディスクRWモニタリソース](#ディスクRWモニタリソース)
-- [IPモニタリソース](#IPモニタリソース)
-- [ユーザ空間モニタリソース](#ユーザ空間モニタリソース)
-- [ボリュームマネージャモニタリソース](#ボリュームマネージャモニタリソース)
-- [PIDモニタリソース](#PIDモニタリソース)
+- [フローティングIP監視リソース](#フローティングIP監視リソース)
+- [カスタム監視リソース](#カスタム監視リソース)
+- [ディスクTUR監視リソース](#ディスク監視リソース)
+- [ディスクRW監視リソース](#ディスクRW監視リソース)
+- [IP監視リソース](#IP監視リソース)
+- [ユーザ空間監視リソース](#ユーザ空間監視リソース)
+- [ボリュームマネージャ監視リソース](#ボリュームマネージャ監視リソース)
+- [PID監視リソース](#PID監視リソース)
+- [サービス監視リソース](#サービス監視リソース)
+- [仮想コンピュータ名監視リソース](#仮想コンピュータ名監視リソース)
+- [Oracle監視リソース](#Oracle監視リソース)
 
 ## 共通パラメータ
 ### 監視 (共通)
@@ -59,23 +62,39 @@
 - 適切なパラメータを設定することで、テンプレート(「回復対象を再起動」等)の動作と同様の回復動作を設定することができます。
   - 回復対象に対してフェイルオーバ実行
     ```bash
+    (X 3系)
     $ clpcfset add monparam genw genw1 emergency/threshold/restart 0
     $ clpcfset add monparam genw genw1 emergency/threshold/fo 1
+    (X 4系)
+    $ clpcfset add monparam genw genw1 emergency/threshold/restart 0
+    $ clpcfset add monparam genw genw1 emergency/threshold/fo2 1
     ```
   - 回復対象を再起動、効果がなければフェイルオーバ実行
     ```bash
+    (X 3系)
     $ clpcfset add monparam genw genw1 emergency/threshold/restart 1
     $ clpcfset add monparam genw genw1 emergency/threshold/fo 1
+    (X 4系)
+    $ clpcfset add monparam genw genw1 emergency/threshold/restart 1
+    $ clpcfset add monparam genw genw1 emergency/threshold/fo2 1
     ```
   - 回復対象を再起動
     ```bash
+    (X 3系)
     $ clpcfset add monparam genw genw1 emergency/threshold/restart 1
     $ clpcfset add monparam genw genw1 emergency/threshold/fo 0
+    (X 4系)
+    $ clpcfset add monparam genw genw1 emergency/threshold/restart 1
+    $ clpcfset add monparam genw genw1 emergency/threshold/fo2 0
     ```
   - 最終動作のみ実行
     ```bash
+    (X 3系)
     $ clpcfset add monparam genw genw1 emergency/threshold/restart 0
     $ clpcfset add monparam genw genw1 emergency/threshold/fo 0
+    (X 4系)
+    $ clpcfset add monparam genw genw1 emergency/threshold/restart 0
+    $ clpcfset add monparam genw genw1 emergency/threshold/fo2 0
     ```
   - カスタム設定
     - 以降に記載するパラメータから必要なものを設定してください。
@@ -107,11 +126,16 @@
 - emergency/preaction/usefailover: フェイルオーバ実行前にスクリプトを実行する
   - 0: 実行しない
   - 1: 実行する
-- emergency/threshold/fo: 最大フェイルオーバ回数
+- emergency/threshold/fo: 最大フェイルオーバ回数 (X 3系)
+  - **サーバ数に合わせる**に設定する場合はこのパラメータを設定する必要はありません。
   ```bash
   $ clpcfset add monparam genw genw1 emergency/threshold/fo 1
   ```
-- emergency/preaction/usefailover: 最終動作前にスクリプトを実行する
+- emergency/threshold/fo2: 最大フェイルオーバ回数 (X 4系)
+  ```bash
+  $ clpcfset add monparam genw genw1 emergency/threshold/fo2 1
+  ```
+- emergency/preaction/use: 最終動作前にスクリプトを実行する
   - 0: 実行しない
   - 1: 実行する
 - emergency/action: 最終動作
@@ -138,7 +162,7 @@
   - emergency/preaction/timeout: タイムアウト
 
 
-## フローティングIPモニタリソース
+## フローティングIP監視リソース
 ### タイプ名: fipw
 - parameters/monmii: NIC Link Up/Downを監視する
   - 0: 監視しない (既定値)
@@ -147,7 +171,7 @@
     $ clpcfset add monparam genw genw1 parameters/monmii 1
     ```
 
-## カスタムモニタリソース
+## カスタム監視リソース
 ### タイプ名: genw
 - parameters/default: スクリプトのタイプ
     - 0: ユーザアプリケーション
@@ -156,7 +180,7 @@
   - ユーザアプリケーションの場合: スクリプトの絶対パス
   - この製品で作成したスクリプトの場合: genw.bat
 
-## ディスクTURモニタリソース
+## ディスクTUR監視リソース
 ### タイプ名: sdw
 - parameters/object: ディスクリソース
   - 対象のディスクリソースを指定してください。
@@ -164,7 +188,7 @@
     $ clpcfset add monparam diskw diskw1 parameters/object sd1
     ```
 
-## ディスクRWモニタリソース
+## ディスクRW監視リソース
 ### タイプ名: diskw
 - parameters/file: ファイル名
   - 対象ファイルの絶対パスを指定してください。
@@ -183,7 +207,7 @@
   - 0: チェックする
   - 1: チェックしない **(default)**
 
-## IPモニタリソース
+## IP監視リソース
 ### タイプ名: ipw
 - parameters/list@\<id\>/ip: IPアドレス
   - 監視対象の IPアドレスが1つの場合、以下のように実行してください。
@@ -197,7 +221,7 @@
     ```
 - parameters/pingtimeout: Pingタイムアウト **(default 5000)**
 
-## ユーザ空間モニタリソース
+## ユーザ空間監視リソース
 ### タイプ名: userw
 - parameters/method: 監視方法
   - keepaliveを指定してください。
@@ -212,3 +236,42 @@
   - 0: チェックしない
   - 1: チェックする **(default)**
 
+## サービス監視リソース
+### タイプ名: servicew
+- 固有のパラメータはありません。
+
+## 仮想コンピュータ名監視リソース
+### タイプ名: vcomw
+- 固有のパラメータはありません。
+
+## Oracle監視リソース
+### タイプ名: oraclew
+- agentparam/monmethod: 監視方式
+  - 0: リスナーとインスタンスを監視 **(default)**
+  - 1: リスナーのみ監視
+  - 2: インスタンスのみ監視
+- agentparam/docreatedrop: 監視レベル
+  - 0: レベル2(update/selectでの監視) **(default)**
+  - 2: レベル0(データベースステータス)
+  - 3: レベル1(selectでの監視) 
+- agentparam/dbname: 接続文字列
+- agentparam/username: ユーザ名
+- agentparam/password: パスワード
+  - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。
+- agentparam/os: OS認証
+  - 0: チェックしない **(default)**
+  - 1: チェックする
+- agentparam/certificate: 認証方式
+  - 0: SYSDBA **(default)**
+  - 1: DEFAULT
+- agentparam/oraclehome: 監視テーブル名
+- agentparam/characterset: 文字コード
+  - (Following the setting of the application)
+  - AMERICAN_AMERICA.US7ASCII
+- emergency/infocollect/use: 障害発生時にアプリケーションの障害情報を採取する
+  - 0: チェックしない **(default)**
+  - 1: チェックする
+- emergency/infocollect/timeout: 採取タイムアウト **(default 600)**
+- agentparam/ignoreuse: Oracleの初期化中またはシャットダウン中をエラーにする  
+  - 0: チェックしない **(default)**
+  - 1: チェックする
