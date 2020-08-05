@@ -24,6 +24,11 @@ main(
 	int			ret;
 	char		obj_num[16];
 
+	if (argc == 1)
+	{
+		printf("need parameter\n");
+		goto func_exit;
+	}
 	if (!strcmp(argv[1], "create"))
 	{
 		init(argv[3]);
