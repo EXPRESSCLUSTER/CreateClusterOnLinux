@@ -26,19 +26,20 @@ main(
 
 	if (argc == 1)
 	{
-		printf("need parameter\n");
+		printf("%d: need parameter\n", __LINE__);
 		goto func_exit;
 	}
 	if (!strcmp(argv[1], "create"))
 	{
 		init(argv[3]);
 	}
-	else if (strcmp(argv[1], "add") & strcmp(argv[1], "rpl") & strcmp(argv[1], "rmv"))
+	else if (strcmp(argv[1], "add") & strcmp(argv[1], "set") & strcmp(argv[1], "delete"))
 	{
-		printf("invalid parameter (argv[1]: %s) \n", argv[1]);
+		printf("%d: invalid parameter (argv[1]: %s) \n",__LINE__,  argv[1]);
 		goto func_exit;
 	}
 
+	/* FIXME - need to check there is clp.conf or not */
 	g_doc = xmlParseFile("clp.conf");
 	strcpy(g_encoding, g_doc->encoding);
 
@@ -181,9 +182,58 @@ main(
 		else
 		{
 		}
-	} else if (!strcmp(argv[1], "rpl")) {
-
-	} else if (!strcmp(argv[1], "rmv")) {
+	} else if (!strcmp(argv[1], "replace")) {
+		if (argv[2] == NULL)
+		{
+			printf("%d: invalid parameter\n", __LINE__);
+			return CONF_ERR_PARAM;
+		}
+		if (!strcmp(argv[2], "srv"))
+		{
+			if (argv[3] == NULL || argv[4] == NULL)
+			{
+				printf("%d: invalid parameter\n", __LINE__);
+				return CONF_ERR_PARAM;
+			}
+			rpl_srv(argv[3], argv[4]);
+		}
+		else if (!strcmp(argv[2], "device"))
+		{
+			if (!strcmp(argv[4], "lan"))
+			{
+				rpl_dev_lan(argv[3], argv[5], argv[6]);
+			}
+		}
+	} else if (!strcmp(argv[1], "delete")) {
+		if (argv[2] == NULL)
+		{
+			printf("%d: invalid parameter\n", __LINE__);
+			return CONF_ERR_PARAM;
+		}
+		if (!strcmp(argv[2], "srv"))
+		{
+			if (argv[3] == NULL)
+			{
+				printf("%d: invalid parameter\n", __LINE__);
+				return CONF_ERR_PARAM;
+			}
+			del_srv(argv[3]);
+		}
+		else if (!strcmp(argv[2], "grp"))
+		{
+			if (argv[3] == NULL)
+			{
+				printf("%d: invalid parameter\n", __LINE__);
+				return CONF_ERR_PARAM;
+			}
+			del_grp(argv[3]);
+		}
+		else
+		{
+			printf("%d: invalid parameter\n", __LINE__);
+			return CONF_ERR_PARAM;
+		}
+	} else if (!strcmp(argv[1], "check")) {
 
 	}
 
@@ -1419,6 +1469,105 @@ add_obj_num(
 
 func_exit:
 	return 0;
+}
+
+/*
+ * Delete objects
+ */
+int
+del_srv(
+	char *srvname
+)
+{
+	char	path[CONF_PATH_LEN];
+	int	ret;
+
+	ret = CONF_ERR_SUCCESS;
+
+	sprintf(path, "/root/server@%s", srvname);
+	del_value(g_doc, path);
+
+	return 0;
+}
+
+int
+del_grp(
+	char *grpname
+)
+{
+	/*
+	 * TODO: 
+	 * - Delete group name if the other path has the group name 
+	 * - Delete monitor resoruces
+	 * - Delete resources 
+	 */
+	char	path[CONF_PATH_LEN];
+	int	ret;
+
+	ret = CONF_ERR_SUCCESS;
+
+	sprintf(path, "/root/group@%s", grpname);
+	del_value(g_doc, path);
+
+	return 0;
+}
+
+/*
+ * Replace
+ */
+int
+rpl_srv(
+	char *curname, 
+	char *newname
+)
+{
+	char	path[CONF_PATH_LEN];
+	int	ret;
+
+	ret = CONF_ERR_SUCCESS;
+
+	sprintf(path, "/root/server@%s", curname);
+	rpl_attr(g_doc, path, "name", newname);
+
+	return 0;
+}
+
+int
+rpl_dev_lan(
+	char *srvname,
+	char *id,
+	char *ipaddr
+)
+{
+	char path[CONF_PATH_LEN];
+	char type[16];
+	int i;
+	int ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+	i = atoi(id);
+	strcpy(type, "lan");
+
+	sprintf(path, "/root/server@%s/device@%s/info", srvname, id);
+	rpl_value(g_doc, path, ipaddr);	
+#if 0
+	sprintf(path, "/root/server@%s/device@%s/type", srvname, id);
+	ret = set_value(g_doc, path, type);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	ret = set_value(g_doc, path, ipaddr);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+#endif
+func_exit:
+	return ret;
 }
 
 int

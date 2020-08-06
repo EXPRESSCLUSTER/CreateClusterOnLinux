@@ -62,6 +62,94 @@ set_value(
 }
 
 
+int
+del_value(
+	xmlDocPtr	doc,
+	char		*path
+)
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr	target_node = NULL;
+	xmlNodePtr	new_text = NULL;
+	char		curr[1024];
+	int			ret = 0;
+
+	strcpy(curr, "/root");
+	root_node = xmlDocGetRootElement(doc);
+	/* TODO: need to add find_node() because find_value_node() create child node */
+	target_node = find_value_node(doc, root_node, path, curr);
+
+	printf("### DEBUG ### %d: target_node is %s\n", __LINE__, curr);
+	xmlUnlinkNode(target_node);
+	xmlFreeNode(target_node);
+#if 0
+	if (target_node != NULL && value != NULL)
+	{
+		new_text = xmlNewText(value);
+		printf("### DEBUG ### %d: target_node is %s\n", __LINE__, curr);
+//		xmlAddChild(target_node, new_text);
+	}
+#endif
+
+	return ret;
+}
+
+
+int
+rpl_attr(
+	xmlDocPtr	doc,
+	char		*path,
+	char		*attr,
+	char		*newname
+)
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr	target_node = NULL;
+	xmlNodePtr	new_text = NULL;
+	char		curr[1024];
+	int			ret = 0;
+
+	strcpy(curr, "/root");
+	root_node = xmlDocGetRootElement(doc);
+	/* TODO: need to add find_node() because find_value_node() create child node */
+	target_node = find_node(doc, root_node, path, curr);
+
+	printf("### DEBUG ### %d: target_node is %s\n", __LINE__, curr);
+	printf("### DEBUG ### %d: newname is %s\n", __LINE__, newname);
+//	xmlNodeSetContent(target_node, newname);
+	xmlSetProp(target_node, attr, newname);
+
+	return ret;
+}
+
+
+int
+rpl_value(
+	xmlDocPtr	doc,
+	char		*path,
+	char		*value
+)
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr	target_node = NULL;
+	xmlNodePtr	new_text = NULL;
+	char		curr[1024];
+	int			ret = 0;
+
+	strcpy(curr, "/root");
+	root_node = xmlDocGetRootElement(doc);
+	/* TODO: need to add find_node() because find_value_node() create child node */
+	target_node = find_node(doc, root_node, path, curr);
+
+	printf("### DEBUG ### %d: target_node is %s\n", __LINE__, curr);
+	printf("### DEBUG ### %d: value is %s\n", __LINE__, value);
+	xmlNodeSetContent(target_node, value);
+//	xmlSetProp(target_node, attr, newname);
+
+	return ret;
+}
+
+
 xmlNodePtr
 find_child_node(
 	xmlDocPtr	doc,
@@ -158,6 +246,79 @@ func_exit:
 			xmlUnlinkNode(ret_node);
 			xmlFreeNode(ret_node);
 			ret_node = make_child_node(node, element, attribute);
+		}
+		child_hit_flag = 0;
+	}
+
+	return ret_node;
+}
+
+
+
+xmlNodePtr
+find_node(
+	xmlDocPtr	doc,
+	xmlNodePtr	node,
+	char		*path, 
+	char		*curr
+)
+{
+	xmlNodePtr		ret_node;
+	char			element[1024];
+	char			attribute[1024];
+	char			*p;
+	int				ret;
+
+	strcpy(element, &path[strlen(curr) + 1]);
+	strcpy(attribute, "");
+	
+	p = strchr(element, '/');
+	if (p != NULL)
+	{
+		*p = '\0';
+	}
+	
+	p = strchr(element, '@');
+	if (p != NULL)
+	{
+		*p = '\0';
+		strcpy(attribute, ++p);
+	}
+
+	child_hit_flag = 0;
+	ret_node = find_child_node(doc, node, element, attribute);
+	if (ret_node == NULL)
+	{
+//		ret_node = make_child_node(node, element, attribute);
+		child_hit_flag = 0;
+	}
+	else
+	{
+		child_hit_flag = 1;
+	}
+	/* continue? */
+	strcat(curr, "/");
+	strcat(curr, element);
+	
+	if (strlen(attribute) > 0)
+	{
+		strcat(curr, "@");
+		strcat(curr, attribute);
+	}
+	
+	if (strcmp(path, curr) != 0)
+	{
+		ret_node = find_node(doc, ret_node, path, curr);
+	}
+	
+func_exit:
+
+	if (child_hit_flag == 1)
+	{	
+		if (strcmp(path, curr) == 0) {
+//			xmlUnlinkNode(ret_node);
+//			xmlFreeNode(ret_node);
+//			ret_node = make_child_node(node, element, attribute);
 		}
 		child_hit_flag = 0;
 	}

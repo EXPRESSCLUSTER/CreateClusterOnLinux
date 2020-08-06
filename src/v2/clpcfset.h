@@ -19,11 +19,16 @@ enum _func_retval__
  //clpconfin.c
 int init(char *encoding);
 int set_value(xmlDocPtr doc, char *path, char *curr);
+int del_value(xmlDocPtr doc, char *path);
+int rpl_attr(xmlDocPtr doc, char *path, char *attr, char *newname);
+int rpl_value(xmlDocPtr doc, char *path, char *value);
 xmlNodePtr find_value_node(xmlDocPtr doc, xmlNodePtr node, char *path, char *curr);
+xmlNodePtr find_node(xmlDocPtr doc, xmlNodePtr node, char *path, char *curr);
 xmlNodePtr find_child_node(xmlDocPtr doc, xmlNodePtr node, char *element, char *attribute);
 xmlNodePtr make_child_node(xmlNodePtr node, char *node_name, char *attr_var);
 
 //clpcfset.c
+/* add */
 int add_cls(char *clsname, char *charset, char *encode, char *os);
 int add_srv(char *srvname, char *priority);
 int add_hba(char *srvname, char *id, char *port, char *device, char *instance);
@@ -53,6 +58,13 @@ int add_mon_param(char *montype, char *monname, char *tag, char *param);
 int add_cls_param(char *tag, char *param);
 int add_cls_webmgr(char *tag, char *param);
 int add_obj_num(char *objnum);
+/* delete */
+int del_srv(char *srvname);
+int del_grp(char *grpname);
+/* replace */
+int rpl_srv(char *curname, char *newname);
+int rpl_dev_lan(char *srvname, char *id, char *ipaddr);
+/* count */
 int cal_obj_num(void);
 int count_hb(void);
 int count_khb(void);
