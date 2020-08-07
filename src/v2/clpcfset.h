@@ -63,7 +63,10 @@ int del_srv(char *srvname);
 int del_grp(char *grpname);
 /* replace */
 int rpl_srv(char *curname, char *newname);
-int rpl_dev_lan(char *srvname, char *id, char *ipaddr);
+int rpl_dev_lan(char *srvname, char *id, char *info);
+int rpl_dev_mdc(char *srvname, char *id, char *info);
+int rpl_dev_diskhb(char *srvname, char *id, char *info);
+int rpl_rsc_param(char *rsctype, char *rscname, char *tag, char *param); 
 /* count */
 int cal_obj_num(void);
 int count_hb(void);

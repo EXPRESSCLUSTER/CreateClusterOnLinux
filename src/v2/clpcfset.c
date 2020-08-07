@@ -203,6 +203,23 @@ main(
 			{
 				rpl_dev_lan(argv[3], argv[5], argv[6]);
 			}
+			else if (!strcmp(argv[4], "mdc"))
+			{
+				rpl_dev_mdc(argv[3], argv[5], argv[6]);
+			}
+			else if (!strcmp(argv[4], "disk"))
+			{
+				rpl_dev_diskhb(argv[3], argv[5], argv[6]);
+			}
+			else
+			{
+				printf("%d: invalid parameter\n", __LINE__);
+				return CONF_ERR_PARAM;
+			}
+		}
+		else if (!strcmp(argv[2], "rscparam"))
+		{
+			rpl_rsc_param(argv[3], argv[4], argv[5], argv[6]);
 		}
 	} else if (!strcmp(argv[1], "delete")) {
 		if (argv[2] == NULL)
@@ -1536,7 +1553,34 @@ int
 rpl_dev_lan(
 	char *srvname,
 	char *id,
-	char *ipaddr
+	char *info
+)
+{
+	char path[CONF_PATH_LEN];
+	int i;
+	int ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	i = atoi(id);
+	if (!(i >= 0 && i <= 99))
+	{
+		printf("ERROR: need to set 0 <= id <= 99 to lan\n");
+		return 1;
+	}
+	sprintf(path, "/root/server@%s/device@%s/info", srvname, id);
+	rpl_value(g_doc, path, info);	
+func_exit:
+	return ret;
+}
+
+
+int
+rpl_dev_mdc(
+	char *srvname,
+	char *id,
+	char *info
 )
 {
 	char path[CONF_PATH_LEN];
@@ -1546,27 +1590,77 @@ rpl_dev_lan(
 
 	/* initialize */
 	ret = CONF_ERR_SUCCESS;
-	i = atoi(id);
-	strcpy(type, "lan");
 
-	sprintf(path, "/root/server@%s/device@%s/info", srvname, id);
-	rpl_value(g_doc, path, ipaddr);	
-#if 0
-	sprintf(path, "/root/server@%s/device@%s/type", srvname, id);
-	ret = set_value(g_doc, path, type);
-	if (ret)
+	i = atoi(id);
+	if (!(i >= 400 && i <= 499))
 	{
-		printf("set_value() failed. (ret: %d)\n", ret);
-		ret = CONF_ERR_FILE;
+		printf("ERROR: need to set 400 <= id <= 499 to mdc\n");
+		return 1;
 	}
-	ret = set_value(g_doc, path, ipaddr);
+	sprintf(path, "/root/server@%s/device@%s/info", srvname, id);
+	rpl_value(g_doc, path, info);	
+	sprintf(path, "/root/server@%s/device@%s/mdc/info", srvname, id);
+	rpl_value(g_doc, path, info);	
+
+func_exit:
+	return ret;
+}
+
+
+int
+rpl_dev_diskhb(
+	char *srvname,
+	char *id,
+	char *info
+)
+{
+	char path[CONF_PATH_LEN];
+	int i;
+	int ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	i = atoi(id);
+	if (!(i >= 300 && i <=399))
+	{
+		printf("ERROR: need to set 300 <= x <= 399 to diskhb\n");
+		return 1;
+	}
+	sprintf(path, "/root/server@%s/device@%s/info", srvname, id);
+	rpl_value(g_doc, path, info);	
+	sprintf(path, "/root/server@%s/device@%s/disk/info", srvname, id);
+	rpl_value(g_doc, path, info);	
+
+func_exit:
+	return ret;
+}
+
+
+
+int
+rpl_rsc_param(
+	char *rsctype,
+	char *rscname,
+	char *tag,
+	char *param
+)
+{
+	char 	path[CONF_PATH_LEN];
+	int 	ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	sprintf(path, "/root/resource/%s@%s/%s", rsctype, rscname, tag);
+	rpl_value(g_doc, path, param);	
+#if 0
 	if (ret)
 	{
 		printf("set_value() failed. (ret: %d)\n", ret);
 		ret = CONF_ERR_FILE;
 	}
 #endif
-func_exit:
 	return ret;
 }
 
