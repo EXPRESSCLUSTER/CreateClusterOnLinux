@@ -77,7 +77,7 @@
   $ clpcfset add grpparam failover failover1 depend/deact/depend@failover3 ""
   ```
 
-- depend/deact/timeout: 対象グループの起動待ち時間 **(default 1800)**
+- depend/deact/timeout: 対象グループの停止待ち時間 **(default 1800)**
   ```
   $ clpcfset add grpparam failover failover1 depend/deact/timeout 1000
   ```

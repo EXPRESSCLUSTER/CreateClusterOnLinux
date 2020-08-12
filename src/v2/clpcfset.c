@@ -104,6 +104,10 @@ main(
 			{
 				add_hb_diskhb(argv[4], argv[5]);
 			}
+			else if (!strcmp(argv[3], "bmchb"))
+			{
+				add_hb_bmchb(argv[4], argv[5]);
+			}
 			else if (!strcmp(argv[3], "witnesshb"))
 			{
 				add_hb_witnesshb(argv[4], argv[5], argv[6]);
@@ -1093,15 +1097,14 @@ add_grp(
 	ret = count_group();
 	sprintf(gid, "%d", ret);
 
-    if (strcmp(grptype, "failover")) {
-		sprintf(path, "/root/group@%s/type", grpname);
-		ret = set_value(g_doc, path, grptype);
-		if (ret)
-		{
-			printf("set_value() failed. (ret: %d)\n", ret);
-			ret = CONF_ERR_FILE;
-		}
+	sprintf(path, "/root/group@%s/type", grpname);
+	ret = set_value(g_doc, path, grptype);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
 	}
+
 	sprintf(path, "/root/group@%s/comment", grpname);
 	ret = set_value(g_doc, path, "");
 	if (ret)

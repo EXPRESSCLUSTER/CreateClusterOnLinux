@@ -6,13 +6,14 @@
 
 ## 目次
 - [共通パラメータ](#共通パラメータ)
+- [ディスクRWモニタリソース](#ディスクRWモニタリソース)
 - [フローティングIPモニタリソース](#フローティングIPモニタリソース)
 - [カスタムモニタリソース](#カスタムモニタリソース)
-- [ディスクRWモニタリソース](#ディスクRWモニタリソース)
 - [IPモニタリソース](#IPモニタリソース)
+- [PIDモニタリソース](#PIDモニタリソース)
+- [プロセス名モニタリソース](#プロセス名モニタリソース)
 - [ユーザ空間モニタリソース](#ユーザ空間モニタリソース)
 - [ボリュームマネージャモニタリソース](#ボリュームマネージャモニタリソース)
-- [PIDモニタリソース](#PIDモニタリソース)
 
 ## 共通パラメータ
 ### 監視 (共通)
@@ -114,7 +115,7 @@
   ```bash
   $ clpcfset add monparam genw genw1 emergency/threshold/fo 1
   ```
-- emergency/preaction/usefailover: 最終動作前にスクリプトを実行する
+- emergency/preaction/use: 最終動作前にスクリプトを実行する
   - 0: 実行しない
   - 1: 実行する
 - emergency/action: 最終動作
@@ -148,6 +149,16 @@
     - この製品で作成したスクリプトの場合: preaction.sh
   - emergency/preaction/timeout: タイムアウト
 
+## ディスクRWモニタリソース
+### タイプ名: diskw
+- parameters/object: 監視先
+  - 監視先のディスクのパスを指定してください。
+    ```bash
+    $ clpcfset add monparam diskw diskw1 parameters/object /dev/sdc2
+    ```
+- parameters/size: I/Oサイズ
+  - 監視方法がREAD(O_DIRECT)のときは512を指定してください。
+
 ## フローティングIPモニタリソース
 ### タイプ名: fipw
 - parameters/monmii: NIC Link Up/Downを監視する
@@ -166,16 +177,6 @@
   - ユーザアプリケーションの場合: スクリプトの絶対パス
   - この製品で作成したスクリプトの場合: genw.bat
 
-## ディスクRWモニタリソース
-### タイプ名: diskw
-- parameters/object: 監視先
-  - 監視先のディスクのパスを指定してください。
-    ```bash
-    $ clpcfset add monparam diskw diskw1 parameters/object /dev/sdc2
-    ```
-- parameters/size: I/Oサイズ
-  - 監視方法がREAD(O_DIRECT)のときは512を指定してください。
-
 ## IPモニタリソース
 ### タイプ名: ipw
 - parameters/list@\<id\>/ip: IPアドレス
@@ -188,6 +189,15 @@
     $ clpcfset add monparam ipw ipw1 parameters/list@0/ip <IP アドレス>
     $ clpcfset add monparam ipw ipw1 parameters/list@1/ip <IP アドレス>
     ```
+
+## PIDモニタリソース
+### タイプ名: pidw
+- 固有のパラメータはありません。
+
+## プロセス名モニタリソース
+## タイプ名: psw
+- parameters/processname: プロセス名
+- parameters/processnum: プロセス数下限値
 
 ## ユーザ空間モニタリソース
 ### タイプ名: userw
@@ -210,7 +220,3 @@
   ```bash
   $ clpcfset add monparam volmgrw volmgrw parameters/devname <VG 名>
   ```
-
-## PIDモニタリソース
-### タイプ名: pidw
-- 固有のパラメータはありません。

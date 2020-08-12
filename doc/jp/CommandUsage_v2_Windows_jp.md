@@ -108,7 +108,7 @@ $ clpcfset add hb lankhb <デバイスID> <プライオリティ>
 
 ## BMCハートビートの追加
 ```bash
-$ clpcfset add bmchb <デバイスID> <プライオリティ>
+$ clpcfset add hb bmchb <デバイスID> <プライオリティ>
 ```
 - プライオリティ: ハートビートのプライオリティは 0 から指定してください。
 - IPアドレス: BMCハートビートで用いるIPアドレスを指定してください。

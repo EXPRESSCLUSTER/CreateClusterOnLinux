@@ -100,7 +100,7 @@ $ clpcfset add hb diskhb <デバイスID> <プライオリティ>
 
 ## BMCハートビートの追加
 ```bash
-$ clpcfset add bmchb <デバイスID> <プライオリティ>
+$ clpcfset add hb bmchb <デバイスID> <プライオリティ>
 ```
 - プライオリティ: ハートビートのプライオリティは 0 から指定してください。
 - IPアドレス: BMCハートビートで用いるIPアドレスを指定してください。
@@ -136,7 +136,10 @@ $ clpcfset add grp <グループのタイプ> <グループ名>
 # グループのパラメータの追加
 $ clpcfset add grpparam <グループのタイプ名> <グループ名> <タグ名> <パラメータ>
 ```
-- グループのタイプ: 通常のグループには **failover** を指定してください。
+- グループのタイプ: 以下の中から指定してください。
+  - failover: フェイルオーバグループ
+  - cluster: 管理用グループ
+  - virtualmachine: 仮想マシングループ
 - グループ名: グループ名を指定してください。
 - タグ名、パラメータについては、[グループのパラメータ](https://github.com/EXPRESSCLUSTER/CreateClusterOnLinux/blob/master/doc/jp/GroupParameters_Linux_jp.md)を参照してください。
 

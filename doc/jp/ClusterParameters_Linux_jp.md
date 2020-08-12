@@ -79,7 +79,11 @@
   - ipmi(High-End Server Option)
   - keepalive **(default)**
     ```bash
-    $ clpcfset add clsparam haltp/method keepalive
+    $ clpcfset add clsparam haltp/method ipmi
+    ```
+
+    ```bash
+    $ clpcfset add clsparam haltp/method ipmi(High-End Server Option)
     ```
     
 - haltp/action: タイムアウト発生時動作

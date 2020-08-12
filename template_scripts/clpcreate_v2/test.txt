@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="EUC-JP"?>
+<root>
+  <all>
+    <charset>EUC-JP</charset>
+    <serveros>linux</serveros>
+    <encode>EUC-JP</encode>
+  </all>
+  <cluster>
+    <name>cluster</name>
+    <comment/>
+  </cluster>
+  <webmgr>
+    <client>
+      <objectnumber>24</objectnumber>
+    </client>
+  </webmgr>
+  <server name="server1">
+    <priority>0</priority>
+    <device id="0">
+      <type>lan</type>
+      <info>192.168.137.71</info>
+    </device>
+    <device id="1">
+      <type>lan</type>
+      <info>192.168.138.71</info>
+    </device>
+    <device id="300">
+      <type>disk</type>
+      <info>/dev/sdd1</info>
+      <extend/>
+      <disk>
+        <info>/dev/sdd1</info>
+        <extend/>
+      </disk>
+    </device>
+    <device id="10200">
+      <type>ping</type>
+      <info>1</info>
+    </device>
+  </server>
+  <server name="server2">
+    <priority>1</priority>
+    <device id="0">
+      <type>lan</type>
+      <info>192.168.137.72</info>
+    </device>
+    <device id="1">
+      <type>lan</type>
+      <info>192.168.138.72</info>
+    </device>
+    <device id="300">
+      <type>disk</type>
+      <info>/dev/sdd1</info>
+      <extend/>
+      <disk>
+        <info>/dev/sdd1</info>
+        <extend/>
+      </disk>
+    </device>
+    <device id="10200">
+      <type>ping</type>
+      <info>1</info>
+    </device>
+  </server>
+  <heartbeat>
+    <lankhb name="lankhb1">
+      <priority>0</priority>
+      <device>0</device>
+    </lankhb>
+    <types name="lankhb"/>
+    <lankhb name="lankhb2">
+      <priority>1</priority>
+      <device>1</device>
+    </lankhb>
+    <types name="diskhb"/>
+    <diskhb name="diskhb1">
+      <priority>2</priority>
+      <device>300</device>
+    </diskhb>
+  </heartbeat>
+  <networkpartition>
+    <types name="pingnp"/>
+    <pingnp name="pingnp1">
+      <priority>0</priority>
+      <device>10200</device>
+      <grp id="0">
+        <list id="0">
+          <ip>192.168.137.1</ip>
+        </list>
+      </grp>
+    </pingnp>
+  </networkpartition>
+  <group name="failover1">
+    <type>failover</type>
+    <comment/>
+    <gid>0</gid>
+    <resource name="fip@fip1"/>
+    <resource name="disk@disk1"/>
+    <resource name="exec@exec1"/>
+  </group>
+  <resource>
+    <fip name="fip1">
+      <comment/>
+      <parameters>
+        <ip>192.168.137.70</ip>
+      </parameters>
+    </fip>
+    <types name="disk"/>
+    <disk name="disk1">
+      <comment/>
+      <parameters>
+        <disktype>disk</disktype>
+        <device>/dev/sdd2</device>
+        <mount>
+          <point>/mnt/disk</point>
+        </mount>
+        <fs>ext3</fs>
+      </parameters>
+    </disk>
+    <types name="exec"/>
+    <exec name="exec1">
+      <comment/>
+      <parameters>
+        <act>
+          <path>start.sh</path>
+        </act>
+        <deact>
+          <path>stop.sh</path>
+        </deact>
+      </parameters>
+    </exec>
+    <types name="fip"/>
+    <fip name="fip2">
+      <comment/>
+    </fip>
+  </resource>
+  <monitor>
+    <types name="userw"/>
+    <userw name="userw">
+      <comment/>
+      <relation>
+        <type>cls</type>
+        <name>LocalServer</name>
+      </relation>
+    </userw>
+    <types name="fipw"/>
+    <fipw name="fipw1">
+      <comment/>
+      <target>fip1</target>
+      <relation>
+        <type>rsc</type>
+        <name>fip1</name>
+      </relation>
+    </fipw>
+    <types name="diskw"/>
+    <diskw name="diskw1">
+      <comment/>
+      <parameters>
+        <object>/dev/sdd2</object>
+        <size>512</size>
+      </parameters>
+      <relation>
+        <type>rsc</type>
+        <name>disk1</name>
+      </relation>
+    </diskw>
+  </monitor>
+  <group name="vmgroup1">
+    <type>virtualmachine</type>
+    <comment/>
+    <gid>1</gid>
+  </group>
+  <group name="managegroup1">
+    <type>cluster</type>
+    <comment/>
+    <gid>2</gid>
+    <resource name="fip@fip2"/>
+  </group>
+</root>

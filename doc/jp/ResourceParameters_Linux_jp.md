@@ -45,12 +45,12 @@
 ## ディスクリソース
 ### タイプ名: disk
 - parameters/disktype: ディスクのタイプ
-  - 通常のデバイスをマウントする場合 **disk** を指定してください。
-  - ボリュームグループ (VG) 上の論理ボリューム (LV) をマウントする場合、**lvm** を指定してください。
-- parameters/device: デバイス名
-- parameters/mount/point: マウントポイント
+  - disk, raw, lvm, vxvm から指定してください
 - parameters/fs: ファイルシステム
-  - ext3, ext4, xfs を指定してください
+  - ext3, ext4, xfs, reiserfs, vxfs, zfs から指定してください
+- parameters/device: デバイス名
+- parameters/rawdevice: RAWデバイス名
+- parameters/mount/point: マウントポイント
 - parameters/fsck/timing: Mount実行前のfsckアクション
   - 0: 実行しない
   - 1: 必ず実行する
