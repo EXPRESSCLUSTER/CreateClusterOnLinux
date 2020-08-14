@@ -6,9 +6,10 @@
 
 ## 目次
 - [共通パラメータ](#共通パラメータ)
-- [ディスクリソース](#ディスクリソース)
-- [スクリプトリソース](#スクリプトリソース)
 - [フローティングIPリソース](#フローティングIPリソース)
+- [スクリプトリソース](#スクリプトリソース)
+- [ディスクリソース](#ディスクリソース)
+- [仮想マシンリソース](#仮想マシンリソース)
 - [サービスリソース](#サービスリソース)
 - [仮想コンピュータ名リソース](#仮想コンピュータ名リソース)
 
@@ -36,6 +37,15 @@
   |   5|クラスタサービス停止とOS再起動||
   |   6|意図的なストップエラーの発生||
 
+## フローティングIPリソース
+### タイプ名: fip
+- parameters/ip: フローティング IP アドレス
+  - インタコネクトと同じサブネットの IP アドレスを指定してください。
+
+## スクリプトリソース
+### タイプ名: script
+- クラスタ構成情報を配信する前にstart.batとstop.batを適切なパスに配置してください。
+
 ## ディスクリソース
 ### タイプ名: sd
 - parameters/volumemountpoint: ドライブ文字
@@ -45,14 +55,27 @@
   - 以下のレポジトリで提供されている clpdiskctrl.exe を用いて GUID を取得することができます。
     - https://github.com/EXPRESSCLUSTER/ControlDisk
 
-## スクリプトリソース
-### タイプ名: script
-- クラスタ構成情報を配信する前にstart.batとstop.batを適切なパスに配置してください。
+## 仮想マシンリソース
+### タイプ名: vm
+- 仮想マシンの種類は**Hyper-V**のみのためパラメータを設定する必要がありません。
+- parameters/vmname: 仮想マシン名
+- parameters/vmconfigpath: VM構成ファイルのパス
+- parameters/reqtimeout: リクエストタイムアウト **(default 180)**
+- parameters/starttimeout: 仮想マシン起動待ち時間 **(default 0)**
+- parameters/stoptimeout: 仮想マシン停止待ち時間 **(default 600)**
+- **リクエストタイムアウト**、**仮想マシン起動待ち時間**、**仮想マシン停止待ち時間**のいずれかを既定値から変更する際は、お手数ですが以下のパラメータも追加してください。
+  - parameters/act/timeout: reqtimeout + starttimeout + 180
 
-## フローティングIPリソース
-### タイプ名: fip
-- parameters/ip: フローティング IP アドレス
-  - インタコネクトと同じサブネットの IP アドレスを指定してください。
+    ```
+    例: reqtimeout = 190, starttimeout = 10
+    $ clpcfset add rscparam vm <リソース名> parameters/act/timeout 380
+    ```
+  - parameters/deact/timeout: reqtimeout + stoptimeout + 180
+  
+    ```
+    例: reqtimeout = 190, stoptimeout = 700
+    $ clpcfset add rscparam vm <リソース名> parameters/act/timeout 1070
+    ```
 
 ## サービスリソース
 ### タイプ名: service

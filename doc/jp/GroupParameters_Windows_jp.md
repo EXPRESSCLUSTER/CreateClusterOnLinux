@@ -95,3 +95,10 @@
   ```
   $ clpcfset add grpparam failover failover1 depend/deact/server/use 1
   ```
+
+- depend/deact/other/use: グループ停止時に対象グループの停止を待ち合わせる
+  - 0: 待ち合わせない **(default)**
+  - 1: 待ち合わせる
+  ```
+  $ clpcfset add grpparam failover failover1 depend/deact/other/use 1
+  ```

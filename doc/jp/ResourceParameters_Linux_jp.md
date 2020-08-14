@@ -9,6 +9,7 @@
 - [ディスクリソース](#ディスクリソース)
 - [EXECリソース](#EXECリソース)
 - [フローティングIPリソース](#フローティングIPリソース)
+- [仮想マシンリソース](#仮想マシンリソース)
 - [ボリュームマネージャリソース](#ボリュームマネージャリソース)
 
 ## 共通パラメータ
@@ -79,6 +80,40 @@
 ### タイプ名: fip
 - parameters/ip: フローティング IP アドレス
   - インタコネクトと同じサブネットの IP アドレスを指定してください。
+
+## 仮想マシンリソース
+### タイプ名: vm
+- parameters/vmtype: 仮想マシンの種類
+  - 0: vSphere
+  - 1: KVM
+  - 2: XenServer
+- parameters/guestos/use: クラスタサービスインストール先
+  - 0: ホスト
+  - 1: ゲスト
+- parameters/vmname: 仮想マシン名
+- parameters/guestos/datastore: データストア名
+- parameters/vmconfigpath: VM構成ファイルのパス
+- parameters/guestos/esxserverip: ホストのIPアドレス
+- parameters/uuid: UUID
+- parameters/libpath: ライブラリパス
+- parameters/username: ユーザ名
+- parameters/password: パスワード
+  - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。
+- parameters/vcenter/use: vCenterを使用する
+  - 0: チェックしない
+    - **vCenterを使用する**をチェック**しない**際は、お手数ですがリソースに以下のパラメータも追加してください。
+      ```
+      $ clpcfset add rscparam vm <リソース名> parameters/migration 6
+      ```
+  - 1: チェックする
+- parameters/vcenter/host: vCenterのホスト名
+- parameters/vcenter/username: vCenterのユーザ名
+- parameters/vcenter/password: vCenterのパスワード
+  - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。
+- parameters/vcenter/rscpool: リソースプール名
+- parameters/reqtimeout: リクエストタイムアウト **(default 30)**
+- parameters/starttimeout: 仮想マシン起動待ち時間 **(default 0)**
+- parameters/stoptimeout: 仮想マシン停止待ち時間 **(default 240)**
 
 ## ボリュームマネージャリソース
 ### タイプ名: volmgr
