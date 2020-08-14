@@ -74,7 +74,7 @@
   
     ```
     例: reqtimeout = 190, stoptimeout = 700
-    $ clpcfset add rscparam vm <リソース名> parameters/act/timeout 1070
+    $ clpcfset add rscparam vm <リソース名> parameters/deact/timeout 1070
     ```
 
 ## サービスリソース

@@ -114,6 +114,19 @@
 - parameters/reqtimeout: リクエストタイムアウト **(default 30)**
 - parameters/starttimeout: 仮想マシン起動待ち時間 **(default 0)**
 - parameters/stoptimeout: 仮想マシン停止待ち時間 **(default 240)**
+- **リクエストタイムアウト**、**仮想マシン起動待ち時間**、**仮想マシン停止待ち時間**のいずれかを既定値から変更する際は、お手数ですが以下のパラメータも追加してください。
+  - parameters/act/timeout: reqtimeout + starttimeout + 180
+
+    ```
+    例: reqtimeout = 190, starttimeout = 10
+    $ clpcfset add rscparam vm <リソース名> parameters/act/timeout 380
+    ```
+  - parameters/deact/timeout: reqtimeout + stoptimeout + 180
+  
+    ```
+    例: reqtimeout = 190, stoptimeout = 700
+    $ clpcfset add rscparam vm <リソース名> parameters/deact/timeout 1070
+    ```
 
 ## ボリュームマネージャリソース
 ### タイプ名: volmgr
