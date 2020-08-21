@@ -10,6 +10,7 @@
 static xmlDocPtr	g_doc = NULL;
 static char			*g_encoding[16];
 int		g_webmgr = 0;
+int		g_messages = 0;
 char	g_ip[1024];
 char	g_subnet[1024];
 
@@ -136,6 +137,14 @@ main(
 				/* error */
 			}
 		}
+		else if (!strcmp(argv[2], "alertservice"))
+		{
+			add_alertservice();
+		}
+		else if (!strcmp(argv[2], "alert"))
+		{
+			add_alert(argv[3], argv[4], argv[5], argv[6], argv[7], argv[8], argv[9], argv[10], argv[11]);
+		}
 		else if (!strcmp(argv[2], "grp"))
 		{
 			add_grp(argv[3], argv[4]);
@@ -177,8 +186,27 @@ main(
 			g_webmgr = 1;
 			add_cls_webmgr(argv[3], argv[4]);
 		}
+		else if (!strcmp(argv[2], "messages"))
+		{
+			g_messages = 1;
+			if (!strcmp(argv[3], "cmdline")) {
+				add_cls_messages_cmdline(argv[4], argv[5], argv[6]);
+			} else{
+				add_cls_messages(argv[3], argv[4], argv[5], argv[6], argv[7], argv[8], argv[9]);
+			}
+			
+		}
+		else if (!strcmp(argv[2], "smtpsrv"))
+		{
+			add_cls_smtpsrv(argv[3], argv[4], argv[5], argv[6], argv[7], argv[8], argv[9], argv[10]);
+		}
+		else if (!strcmp(argv[2], "snmpsrv"))
+		{
+			add_cls_snmpsrv(argv[3], argv[4], argv[5], argv[6]);
+		}
 		else
 		{
+
 		}
 	} else if (!strcmp(argv[1], "rpl")) {
 
@@ -1080,6 +1108,219 @@ func_exit:
 
 }
 
+int
+add_alertservice()
+{
+	char 	path[CONF_PATH_LEN];
+	int 	ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	ret = set_value(g_doc, "/root/cluster/dn1000s/use", "1");
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	ret = set_value(g_doc, "/root/alertservice/types@dn1000s", "");
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	ret = set_value(g_doc, "/root/alertservice/dn1000s@dn1000s1/priority", "0");
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	ret = set_value(g_doc, "/root/alertservice/dn1000s@dn1000s1/device", "20000");
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	ret = set_value(g_doc, "/root/alertservice/dn1000s@dn1000s1/kind", "nm");
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+
+func_exit:
+	return ret;
+}
+
+int
+add_alert(
+	char *srvname,
+	char *id,
+	char *type,
+	char *info,
+	char *user,
+	char *password,
+	char *rshpath,
+	char *startvoice,
+	char *stopvoice
+)
+{
+	char 	path[CONF_PATH_LEN];
+	char	nvoice[CONF_PATH_LEN];
+	char	nvoicefile[CONF_PATH_LEN];
+	char	evoice[CONF_PATH_LEN];
+	char	evoicefile[CONF_PATH_LEN];
+	int 	ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	sprintf(path, "/root/server@%s/device@%s/type", srvname, id);
+	ret = set_value(g_doc, path, type);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/info", srvname, id);
+	ret = set_value(g_doc, path, info);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/user", srvname, id);
+	ret = set_value(g_doc, path, user);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/password", srvname, id);
+	ret = set_value(g_doc, path, password);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	
+	if (!strcmp(rshpath, "0"))
+	{
+		sprintf(path, "/root/server@%s/device@%s/rsh", srvname, id);
+		ret = set_value(g_doc, path, "0");
+		if (ret)
+		{
+			printf("set_value() failed. (ret: %d)\n", ret);
+			ret = CONF_ERR_FILE;
+		}
+		sprintf(path, "/root/server@%s/device@%s/rshpath", srvname, id);
+		ret = set_value(g_doc, path, "");
+		if (ret)
+		{
+			printf("set_value() failed. (ret: %d)\n", ret);
+			ret = CONF_ERR_FILE;
+		}
+	}
+	else
+	{
+		sprintf(path, "/root/server@%s/device@%s/rsh", srvname, id);
+		ret = set_value(g_doc, path, "1");
+		if (ret)
+		{
+			printf("set_value() failed. (ret: %d)\n", ret);
+			ret = CONF_ERR_FILE;
+		}
+		sprintf(path, "/root/server@%s/device@%s/rshpath", srvname, id);
+		ret = set_value(g_doc, path, rshpath);
+		if (ret)
+		{
+			printf("set_value() failed. (ret: %d)\n", ret);
+			ret = CONF_ERR_FILE;
+		}
+	}
+	
+	if (!strcmp(type, "dn1000s") | !strcmp(type, "patlite"))
+	{
+		strcpy(nvoice, "");
+		strcpy(nvoicefile, "");
+		strcpy(evoice, "");
+		strcpy(evoicefile, "");
+	}
+	else if (!strcmp(type, "dn1500gl") | !strcmp(type, "nhfv1"))
+	{
+		if (!strcmp(startvoice, "0"))
+		{
+			strcpy(nvoice, "0");
+			if (!strcmp(type, "dn1500gl"))
+			{
+				strcpy(nvoicefile, "01");
+			}
+			else if (!strcmp(type, "nhfv1"))
+			{
+				strcpy(nvoicefile, "65");
+			}
+		}
+		else
+		{
+			strcpy(nvoice, "1");
+			strcpy(nvoicefile, startvoice);
+		}
+
+		if (!strcmp(stopvoice, "0"))
+		{
+			strcpy(evoice, "0");
+			if (!strcmp(type, "dn1500gl"))
+			{
+				strcpy(evoicefile, "02");
+			}
+			else if (!strcmp(type, "nhfv1"))
+			{
+				strcpy(evoicefile, "66");
+			}
+		}
+		else
+		{
+			strcpy(evoice, "1");
+			strcpy(evoicefile, stopvoice);
+		}
+	}
+	else
+	{
+
+	}
+
+	sprintf(path, "/root/server@%s/device@%s/normal/voice", srvname, id);
+	ret = set_value(g_doc, path, nvoice);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/normal/voicefile", srvname, id);
+	ret = set_value(g_doc, path, nvoicefile);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/error/voice", srvname, id);
+	ret = set_value(g_doc, path, evoice);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/error/voicefile", srvname, id);
+	ret = set_value(g_doc, path, evoicefile);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+
+func_exit:
+	return ret;
+}
 
 int
 add_grp(
@@ -1370,21 +1611,22 @@ add_cls_webmgr(
 	memset(path, "\0", sizeof(path)); 
 	memset(buf, "\0", sizeof(buf)); 
 
+	strcpy(buf, param);
+	token = strchr(buf, '/');
+	if (!token)
+	{
+		/* no subnet mask */
+		strcpy(g_ip, buf);
+	}
+	else
+	{
+		strncpy(g_ip, buf, token - buf);
+		g_ip[token - buf] = '\0';
+		strcpy(g_subnet, token + 1);	
+	}
+
 	if (!strcmp(tag, "clientlist"))
 	{
-		strcpy(buf, param);
-		token = strchr(buf, '/');
-		if (!token)
-		{
-			/* no subnet mask */
-			strcpy(g_ip, buf);
-		}
-		else
-		{
-			strncpy(g_ip, buf, token - buf);
-			g_ip[token - buf] = '\0';
-			strcpy(g_subnet, token + 1);	
-		}
 		sprintf(path, "/root/webmgr/security/clientlist/ip@%s", g_ip);
 		ret = set_value(g_doc, path, NULL);
 		if (ret)
@@ -1392,6 +1634,242 @@ add_cls_webmgr(
 			printf("set_value() failed. (ret: %d)\n", ret);
 			ret = CONF_ERR_FILE;
 		}
+	}
+	else if (!strcmp(tag, "clientlistro"))
+	{
+		sprintf(path, "/root/webmgr/security/clientlist/ipro@%s", g_ip);
+		ret = set_value(g_doc, path, NULL);
+		if (ret)
+		{
+			printf("set_value() failed. (ret: %d)\n", ret);
+			ret = CONF_ERR_FILE;
+		}
+	}
+
+func_exit:
+	return ret;
+}
+
+int
+add_cls_messages(
+	char *type,
+	char *id,
+	char *alert,
+	char *altexec,
+	char *mail,
+	char *trap,
+	char *syslog
+)
+{
+	char 	path[CONF_PATH_LEN];
+	int		ret;
+	
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	sprintf(path, "/root/messages/types@%s", type);
+	ret = set_value(g_doc, path, "");
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/messages/%s@%s/alert", type, id);
+	ret = set_value(g_doc, path, alert);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/messages/%s@%s/altexec", type, id);
+	ret = set_value(g_doc, path, altexec);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/messages/%s@%s/mail", type, id);
+	ret = set_value(g_doc, path, mail);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/messages/%s@%s/trap", type, id);
+	ret = set_value(g_doc, path, trap);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/messages/%s@%s/syslog", type, id);
+	ret = set_value(g_doc, path, syslog);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+
+func_exit:
+	return ret;
+}
+
+int
+add_cls_messages_cmdline(
+	char *type,
+	char *id,
+	char *cmdline
+)
+{
+	char 	path[CONF_PATH_LEN];
+	int		ret;
+	int		count;
+	
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+	count = count_messages_cmdline(type, id, cmdline);
+	if (count == -1)
+	{
+		printf("set_value() failed. %s already exists.\n", cmdline);
+		ret = CONF_ERR_FILE;
+		goto func_exit;
+	}
+
+	sprintf(path, "/root/messages/%s@%s/cmd@%d/cmdline", type, id, count);
+	ret = set_value(g_doc, path, cmdline);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+
+func_exit:
+	return ret;
+}
+
+int
+add_cls_smtpsrv(
+	char *priority,
+	char *srvname,
+	char *port,
+	char *senderaddress,
+	char *auth,
+	char *authmethod,
+	char *username,
+	char *passwd)
+{
+	char 	path[CONF_PATH_LEN];
+	int		ret;
+	int		count;
+	
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+	count = count_smtpsrv();
+
+	sprintf(path, "/root/cluster/mail/smtp/smtpsrv@%d/priority", count);
+	ret = set_value(g_doc, path, priority);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/mail/smtp/smtpsrv@%d/srvname", count);
+	ret = set_value(g_doc, path, srvname);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/mail/smtp/smtpsrv@%d/port", count);
+	ret = set_value(g_doc, path, port);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/mail/smtp/smtpsrv@%d/senderaddress", count);
+	ret = set_value(g_doc, path, senderaddress);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/mail/smtp/smtpsrv@%d/auth", count);
+	ret = set_value(g_doc, path, auth);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/mail/smtp/smtpsrv@%d/authmethod", count);
+	ret = set_value(g_doc, path, authmethod);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/mail/smtp/smtpsrv@%d/username", count);
+	ret = set_value(g_doc, path, username);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/mail/smtp/smtpsrv@%d/passwd", count);
+	ret = set_value(g_doc, path, passwd);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+
+func_exit:
+	return ret;
+}
+
+int
+add_cls_snmpsrv(
+	char *srvname,
+	char *port,
+	char *snmpver,
+	char *snmpcom
+)
+{
+	char 	path[CONF_PATH_LEN];
+	int		ret;
+	int		count;
+	
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+	count = count_snmpsrv();
+
+	sprintf(path, "/root/cluster/trap/snmpsrv@%d/srvname", count);
+	ret = set_value(g_doc, path, srvname);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/trap/snmpsrv@%d/port", count);
+	ret = set_value(g_doc, path, port);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/trap/snmpsrv@%d/snmpver", count);
+	ret = set_value(g_doc, path, snmpver);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/cluster/trap/snmpsrv@%d/snmpcom", count);
+	ret = set_value(g_doc, path, snmpcom);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
 	}
 
 func_exit:
@@ -1655,6 +2133,137 @@ count_monitor()
 				if (strcmp(n_child->name, "types") & strcmp(n_child->name, "text"))
 				{
 					ret++;
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
+int
+count_messages_cmdline
+(
+	char *type,
+	char *id,
+	char *cmdline
+)
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n1;
+	xmlNodePtr	n2;
+	xmlChar		*value;
+	char		element[32];
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	strcpy(element, "messages");
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, element))
+		{
+			for (n1 = n->children; n1 != NULL; n1 = n1->next)
+			{
+				if (strcmp(n1->name, type))
+				{
+					continue;
+				}
+				if (!strcmp(xmlGetProp(n1, "id"), id))
+				{
+					for (n2 = n1->children; n2 != NULL; n2 = n2->next)
+					{
+						if (!strcmp(n2->name, "cmd"))
+						{
+							if (!strcmp(n2->children->name, "cmdline"))
+							{
+								value = xmlNodeListGetString(g_doc, n2->children->children, 1);
+								if (!strcmp(value, cmdline)) {
+									ret = -1;
+									goto func_exit;
+								}
+								xmlFree(value);
+							}
+							ret++;
+						}
+					}
+				}
+			}
+		}
+	}
+
+func_exit:
+	return ret;
+}
+
+int
+count_smtpsrv()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n1;
+	xmlNodePtr	n2;
+	xmlNodePtr	n3;
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, "cluster"))
+		{
+			for (n1 = n->children; n1 != NULL; n1 = n1->next)
+			{
+				if (!strcmp(n1->name, "mail"))
+				{
+					for (n2 = n1->children; n2 != NULL; n2 = n2->next)
+					{
+						if (!strcmp(n2->name, "smtp"))
+						{
+							for (n3 = n2->children; n3 != NULL; n3 = n3->next)
+							{
+								if (!strcmp(n3->name, "smtpsrv"))
+								{
+									ret++;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
+int
+count_snmpsrv()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n1;
+	xmlNodePtr	n2;
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, "cluster"))
+		{
+			for (n1 = n->children; n1 != NULL; n1 = n1->next)
+			{
+				if (!strcmp(n1->name, "trap"))
+				{
+					for (n2 = n1->children; n2 != NULL; n2 = n2->next)
+					{
+						if (!strcmp(n2->name, "snmpsrv"))
+						{
+							ret++;
+						}
+					}
 				}
 			}
 		}

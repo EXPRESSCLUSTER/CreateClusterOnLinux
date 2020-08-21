@@ -8,7 +8,9 @@
 - [リカバリ](#リカバリ)
 - [NP解決](#NP解決)
 - [監視](#監視)
+- [アラートサービス](#アラートサービス)
 - [WebManager](#WebManager)
+- [アラートログ](#アラートログ)
 - [アカウント](#アカウント)
 
 ## リカバリ
@@ -69,6 +71,66 @@
   - 0: チェックしない **(default)**
   - 1: チェックする
 
+## アラートサービス
+- cluster/messages/use: アラート通報設定を有効にする
+  - 0: チェックしない **(default)**
+  - 1: チェックする
+- アラート送信先の変更
+  - メッセージの追加
+    ```
+    $ clpcfset add messages <モジュールタイプ> <イベントID> <Alert Logs> <Alert Extension> <Mail Report> <SNMP Trap> <Event Log(DisableOnly)>
+
+    e.g.
+    $ clpcfset add messages apisv 123 1 1 1 0 0
+    ```
+    - カテゴリはモジュールタイプをもとに自動で判断されます。
+    - 送信先は 0: チェックしない、1: チェックする。
+  - メッセージにコマンドを追加
+    ```
+    $ clpcfset add messages cmdline <モジュールタイプ> <イベントID> <コマンド>
+    ```
+### メール通報
+- cluster/mail/address: メールアドレス
+- cluster/mail/subject: 件名
+- メール送信方法はSMTPのため、指定する必要はありません。
+- SMTP設定
+  - cluster/mail/smtp/charset: メール送信文書の文字コード
+    - Shift_JIS
+    - ISO-2022-jp
+    - ISO-8859-1
+  - cluster/mail/smtp/timeout: 通信応答待ち時間 **(default 30)**
+  - cluster/mail/smtp/subencode: 件名のエンコードをする
+    - 0: チェックしない **(default)**
+    - 1: チェックする
+  - SMTPサーバの追加
+    ```
+    $ clpcfset add smtpsrv <プライオリティ> <SMTPサーバ> <SMTPポート番号> <差出人メールアドレス> <SMTP認証を有効にする> <認証方式> <ユーザ名> <パスワード>
+    ```
+    - プライオリティは0から始まり、追加するたびに1ずつ増えていきます。
+    - SMTP認証を有効にする 0: チェックしない、1: チェックする
+    - 認証方式 CRAM-MD5, LOGIN, PLAIN
+    - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。
+### SNMPトラップ
+- 送信先設定
+  - 送信先の追加
+    ```
+    $ clpcfset add snmpsrv <送信先サーバ> <SNMPポート番号> <SNMPバージョン> <SNMPコミュニティ名>
+    ```
+    - SNMPバージョン v1, v2c
+- cluster/cialert/use: 筐体IDランプ連携を使用する
+  - 0: チェックしない **(default)**
+  - 1: チェックする
+- cluster/cialert/repeat: 繰り返し実行
+  - 0: 繰り返し実行しない
+  - 1: 繰り返し実行する **(default)**
+- cluster/cialert/execcmd_interval: インターバル **(default 120)**
+- ネットワーク警告灯を使用する
+
+  使用するには以下のコマンドを実行してください。
+  ```
+  $ clpcfset add alertservice
+  ```
+
 ## WebManager
 - webmgr/security/clientlist/iprest: クライアントのIPアドレスによって接続を制御する
   - 0: チェックしない **(default)**
@@ -76,11 +138,24 @@
     ```
     $ clpcfset add clsparam webmgr/security/clientlist/iprest 1
     ```
-  - 制御対象のIPアドレスは、以下で設定してください。 
+  - 接続を許可するIPアドレス(操作権あり)は、以下で設定してください。 
     ```
     $ clpcfset add webmgr clientlist 192.168.100.1
     $ clpcfset add webmgr clientlist 192.168.200.0/24
     ```
+  - 接続を許可するIPアドレス(操作権なし)は、以下で設定してください。 
+    ```
+    $ clpcfset add webmgr clientlistro 192.168.100.1
+    $ clpcfset add webmgr clientlistro 192.168.200.0/24
+    ```
+
+## アラートログ
+- webalert/use: アラートサービスを有効にする
+  - 0: チェックしない
+  - 1: チェックする **(default)**
+- webalert/main/alertlog/maxrecordcount: 保存最大アラートレコード数 **(default 10000)**
+- 方法は unicast のみのため指定する必要はありません。
+- webalert/daemon/timeout: 通信タイムアウト **(default 30)**
 
 ## アカウント
 - cluster/account/list@<ユーザID>/username: ユーザ名

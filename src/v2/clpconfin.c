@@ -10,6 +10,7 @@
 
 int child_hit_flag;
 extern int	g_webmgr;
+extern int	g_messages;
 extern char	g_subnet[CONF_PATH_LEN];
 
 int
@@ -183,9 +184,18 @@ make_child_node(
 
 	if (strlen(attr_var) > 0)
 	{
-		if (!strcmp(node_name, "device") | !strcmp(node_name, "list") | !strcmp(node_name, "hba") | !strcmp(node_name, "grp") | !strcmp(node_name, "servers") | !strcmp(node_name, "netdev"))
+		if (!strcmp(node_name, "device") | !strcmp(node_name, "list") | !strcmp(node_name, "hba") | !strcmp(node_name, "grp")
+			| !strcmp(node_name, "servers") | !strcmp(node_name, "netdev") | !strcmp(node_name, "smtpsrv") | !strcmp(node_name, "snmpsrv")
+			| g_messages == 1)
 		{
-			strcpy(attr_name, "id");
+			if (!strcmp(node_name, "types"))
+			{
+				strcpy(attr_name, "name");
+			}
+			else
+			{
+				strcpy(attr_name, "id");
+			}
 		}
 		else
 		{
@@ -198,8 +208,6 @@ make_child_node(
 				}
 				else
 				{
-					printf("%s\n", attr_var);
-					printf("%s\n", g_subnet);
 					sprintf(attr_var2, "%s/%s", attr_var, g_subnet);
 				}
 			}

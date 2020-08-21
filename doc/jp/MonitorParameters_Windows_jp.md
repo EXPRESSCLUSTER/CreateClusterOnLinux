@@ -6,18 +6,20 @@
 
 ## 目次
 - [共通パラメータ](#共通パラメータ)
-- [フローティングIP監視リソース](#フローティングIP監視リソース)
-- [カスタム監視リソース](#カスタム監視リソース)
-- [ディスクTUR監視リソース](#ディスク監視リソース)
 - [ディスクRW監視リソース](#ディスクRW監視リソース)
+- [フローティングIP監視リソース](#フローティングIP監視リソース)
 - [IP監視リソース](#IP監視リソース)
-- [仮想マシン監視リソース](#仮想マシン監視リソース)
-- [ユーザ空間監視リソース](#ユーザ空間監視リソース)
-- [ボリュームマネージャ監視リソース](#ボリュームマネージャ監視リソース)
-- [PID監視リソース](#PID監視リソース)
+- [ディスクTUR監視リソース](#ディスク監視リソース)
 - [サービス監視リソース](#サービス監視リソース)
 - [仮想コンピュータ名監視リソース](#仮想コンピュータ名監視リソース)
+- [カスタム監視リソース](#カスタム監視リソース)
+- [仮想マシン監視リソース](#仮想マシン監視リソース)
+- [DB2監視リソース](#DB2監視リソース)
+- [ODBC監視リソース](#ODBC監視リソース)
 - [Oracle監視リソース](#Oracle監視リソース)
+- [PostgreSQL監視リソース](#PostgreSQL監視リソース)
+- [SQLServer監視リソース](#SQLServer監視リソース)
+- [ユーザ空間監視リソース](#ユーザ空間監視リソース)
 
 ## 共通パラメータ
 ### 監視 (共通)
@@ -162,33 +164,6 @@
     - この製品で作成したスクリプトの場合: preaction.bat
   - emergency/preaction/timeout: タイムアウト
 
-
-## フローティングIP監視リソース
-### タイプ名: fipw
-- parameters/monmii: NIC Link Up/Downを監視する
-  - 0: 監視しない (既定値)
-  - 1: 監視する
-    ```bash
-    $ clpcfset add monparam genw genw1 parameters/monmii 1
-    ```
-
-## カスタム監視リソース
-### タイプ名: genw
-- parameters/default: スクリプトのタイプ
-    - 0: ユーザアプリケーション
-    - 1: この製品で作成したスクリプト
-- parameters/path ファイル
-  - ユーザアプリケーションの場合: スクリプトの絶対パス
-  - この製品で作成したスクリプトの場合: genw.bat
-
-## ディスクTUR監視リソース
-### タイプ名: sdw
-- parameters/object: ディスクリソース
-  - 対象のディスクリソースを指定してください。
-    ```bash
-    $ clpcfset add monparam diskw diskw1 parameters/object sd1
-    ```
-
 ## ディスクRW監視リソース
 ### タイプ名: diskw
 - parameters/file: ファイル名
@@ -208,6 +183,15 @@
   - 0: チェックする
   - 1: チェックしない **(default)**
 
+## フローティングIP監視リソース
+### タイプ名: fipw
+- parameters/monmii: NIC Link Up/Downを監視する
+  - 0: 監視しない (既定値)
+  - 1: 監視する
+    ```bash
+    $ clpcfset add monparam genw genw1 parameters/monmii 1
+    ```
+
 ## IP監視リソース
 ### タイプ名: ipw
 - parameters/list@\<id\>/ip: IPアドレス
@@ -222,24 +206,13 @@
     ```
 - parameters/pingtimeout: Pingタイムアウト **(default 5000)**
 
-## 仮想マシン監視リソース
-### タイプ名: vmw
-- parameters/object: 仮想マシンリソース
-
-## ユーザ空間監視リソース
-### タイプ名: userw
-- parameters/method: 監視方法
-  - keepaliveを指定してください。
+## ディスクTUR監視リソース
+### タイプ名: sdw
+- parameters/object: ディスクリソース
+  - 対象のディスクリソースを指定してください。
     ```bash
-    $ clpcfset add monparam userw userw1 parameters/method keepalive
+    $ clpcfset add monparam diskw diskw1 parameters/object sd1
     ```
-- parameters/stallaction: タイムアウト発生時動作
-  - 0: 何もしない
-  - 1: HWリセット
-  - 2: 意図的なストップエラーの発生 **(default)**
-- parameters/mkthread: ダミースレッドの作成
-  - 0: チェックしない
-  - 1: チェックする **(default)**
 
 ## サービス監視リソース
 ### タイプ名: servicew
@@ -248,6 +221,42 @@
 ## 仮想コンピュータ名監視リソース
 ### タイプ名: vcomw
 - 固有のパラメータはありません。
+
+## カスタム監視リソース
+### タイプ名: genw
+- parameters/default: スクリプトのタイプ
+    - 0: ユーザアプリケーション
+    - 1: この製品で作成したスクリプト
+- parameters/path ファイル
+  - ユーザアプリケーションの場合: スクリプトの絶対パス
+  - この製品で作成したスクリプトの場合: genw.bat
+
+## 仮想マシン監視リソース
+### タイプ名: vmw
+- parameters/object: 仮想マシンリソース
+
+## DB2監視リソース
+### タイプ名: db2w
+- agentparam/docreatedrop: 監視レベル
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+- agentparam/dbname: データベース名
+- agentparam/instance: インスタンス名 **(default DB2)**
+- agentparam/username: ユーザ名 **(default db2admin)**
+- agentparam/password: パスワード
+  - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。
+- agentparam/tablename: 監視テーブル名 **(default DB2WATCH)**
+
+## ODBC監視リソース
+### タイプ名: odbcw
+- agentparam/docreatedrop: 監視レベル
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+- agentparam/dbname: データソース名
+- agentparam/username: ユーザ名
+- agentparam/password: パスワード
+  - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。
+- agentparam/tablename: 監視テーブル名 **(default ODBCWATCH)**
 
 ## Oracle監視リソース
 ### タイプ名: oraclew
@@ -280,3 +289,52 @@
 - agentparam/ignoreuse: Oracleの初期化中またはシャットダウン中をエラーにする  
   - 0: チェックしない **(default)**
   - 1: チェックする
+
+## PostgreSQL監視リソース
+### タイプ名: psqlw
+- agentparam/docreatedrop: 監視レベル
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+- agentparam/dbname: データベース名
+- agentparam/ipaddress: IPアドレス **(default 127.0.0.1)**
+- agentparam/port: ポート番号 **(default 5432)**
+- agentparam/username: ユーザ名 **(default postgres)**
+- agentparam/password: パスワード
+  - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。
+- agentparam/tablename: 監視テーブル名 **(default PSQLWATCH)**
+- agentparam/ignoreuse: PostgreSQLの初期化中またはシャットダウン中をエラーにする
+  - 0: チェックしない
+  - 1: チェックする **(default)**
+
+## SQLServer監視リソース
+### タイプ名: sqlserverw
+- agentparam/docreatedrop: 監視レベル
+  - 2: レベル0(データベースステータス)
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+- agentparam/dbname: データベース名
+- agentparam/instance: インスタンス名 **(default MSSQLSERVER)**
+- agentparam/username: ユーザ名 **(default SA)**
+- agentparam/password: パスワード
+  - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。
+- agentparam/tablename: 監視テーブル名 **(default SQLWATCH)**
+- agentparam/odbcname: ODBCドライバ名
+  - SQL Server Native Client 11.0
+  - ODBC Driver 13 for SQL Server
+  - ODBC Driver 17 for SQL Server
+  - SQL Server
+
+## ユーザ空間監視リソース
+### タイプ名: userw
+- parameters/method: 監視方法
+  - keepaliveを指定してください。
+    ```bash
+    $ clpcfset add monparam userw userw1 parameters/method keepalive
+    ```
+- parameters/stallaction: タイムアウト発生時動作
+  - 0: 何もしない
+  - 1: HWリセット
+  - 2: 意図的なストップエラーの発生 **(default)**
+- parameters/mkthread: ダミースレッドの作成
+  - 0: チェックしない
+  - 1: チェックする **(default)**
