@@ -143,7 +143,23 @@ main(
 		}
 		else if (!strcmp(argv[2], "alert"))
 		{
-			add_alert(argv[3], argv[4], argv[5], argv[6], argv[7], argv[8], argv[9], argv[10], argv[11]);
+			if (find_os() == CONF_OS_WIN)
+			{
+				if (argc != 12) {
+					printf("The number of argument is wrong.\n");
+					return CONF_ERR_FILE;
+				}
+				add_alert_win(argv[3], argv[4], argv[5], argv[6], argv[7], argv[8], argv[9], argv[10], argv[11]);
+			}
+			else if (find_os() == CONF_OS_LIN)
+			{
+				if (argc != 9) {
+					printf("The number of argument is wrong.\n");
+					return CONF_ERR_FILE;
+				}
+				add_alert_lin(argv[3], argv[4], argv[5], argv[6], argv[7], argv[8]);
+			}
+			
 		}
 		else if (!strcmp(argv[2], "grp"))
 		{
@@ -1153,7 +1169,7 @@ func_exit:
 }
 
 int
-add_alert(
+add_alert_win(
 	char *srvname,
 	char *id,
 	char *type,
@@ -1321,6 +1337,125 @@ add_alert(
 func_exit:
 	return ret;
 }
+
+int
+add_alert_lin(
+	char *srvname,
+	char *id,
+	char *type,
+	char *info,
+	char *startvoice,
+	char *stopvoice
+)
+{
+	char 	path[CONF_PATH_LEN];
+	char	nvoice[CONF_PATH_LEN];
+	char	nvoicefile[CONF_PATH_LEN];
+	char	evoice[CONF_PATH_LEN];
+	char	evoicefile[CONF_PATH_LEN];
+	int 	ret;
+
+	/* initialize */
+	ret = CONF_ERR_SUCCESS;
+
+	sprintf(path, "/root/server@%s/device@%s/type", srvname, id);
+	ret = set_value(g_doc, path, type);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/info", srvname, id);
+	ret = set_value(g_doc, path, info);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	
+	if (!strcmp(type, "dn1000s") | !strcmp(type, "patlite"))
+	{
+		strcpy(nvoice, "");
+		strcpy(nvoicefile, "");
+		strcpy(evoice, "");
+		strcpy(evoicefile, "");
+	}
+	else if (!strcmp(type, "dn1500gl") | !strcmp(type, "nhfv1"))
+	{
+		if (!strcmp(startvoice, "0"))
+		{
+			strcpy(nvoice, "0");
+			if (!strcmp(type, "dn1500gl"))
+			{
+				strcpy(nvoicefile, "01");
+			}
+			else if (!strcmp(type, "nhfv1"))
+			{
+				strcpy(nvoicefile, "65");
+			}
+		}
+		else
+		{
+			strcpy(nvoice, "1");
+			strcpy(nvoicefile, startvoice);
+		}
+
+		if (!strcmp(stopvoice, "0"))
+		{
+			strcpy(evoice, "0");
+			if (!strcmp(type, "dn1500gl"))
+			{
+				strcpy(evoicefile, "02");
+			}
+			else if (!strcmp(type, "nhfv1"))
+			{
+				strcpy(evoicefile, "66");
+			}
+		}
+		else
+		{
+			strcpy(evoice, "1");
+			strcpy(evoicefile, stopvoice);
+		}
+	}
+	else
+	{
+
+	}
+
+	sprintf(path, "/root/server@%s/device@%s/normal/voice", srvname, id);
+	ret = set_value(g_doc, path, nvoice);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/normal/voicefile", srvname, id);
+	ret = set_value(g_doc, path, nvoicefile);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/error/voice", srvname, id);
+	ret = set_value(g_doc, path, evoice);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+	sprintf(path, "/root/server@%s/device@%s/error/voicefile", srvname, id);
+	ret = set_value(g_doc, path, evoicefile);
+	if (ret)
+	{
+		printf("set_value() failed. (ret: %d)\n", ret);
+		ret = CONF_ERR_FILE;
+	}
+
+func_exit:
+	return ret;
+}
+
 
 int
 add_grp(
@@ -2269,5 +2404,47 @@ count_snmpsrv()
 		}
 	}
 
+	return ret;
+}
+
+int find_os()
+{
+	xmlNodePtr	root_node = NULL;
+	xmlNodePtr  n;
+	xmlNodePtr	n1;
+	xmlChar		*value;
+	int			ret = 0;
+
+	root_node = xmlDocGetRootElement(g_doc);
+	
+	for (n = root_node->children; n != NULL; n = n->next)
+	{
+		if (!strcmp(n->name, "all"))
+		{
+			for (n1 = n->children; n1 != NULL; n1 = n1->next)
+			{
+				if (!strcmp(n1->name, "serveros"))
+				{
+					value = xmlNodeListGetString(g_doc, n1->children, 1);
+					if (!strcmp(value, "windows")) {
+						ret = CONF_OS_WIN;
+						goto func_exit;
+					}
+					else if (!strcmp(value, "linux"))
+					{
+						ret = CONF_OS_LIN;
+						goto func_exit;
+					}
+					else
+					{
+
+					}
+					xmlFree(value);
+				}
+			}
+		}
+	}
+
+func_exit:
 	return ret;
 }

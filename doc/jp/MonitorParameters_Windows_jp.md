@@ -1,4 +1,4 @@
-# Resource Parameters for Windows cluster
+# Monitor Parameters for Windows cluster
 - モニタリソースパラメータの詳細について説明しています。
 - **(default)** と記載された設定値を利用する場合は、コマンドでパラメータを設定する必要はありません。
 - **ver1**を使用する場合は、コマンド例の**clpcfset**を**clpcreate**に置き換えてください。
@@ -265,9 +265,9 @@
   - 1: リスナーのみ監視
   - 2: インスタンスのみ監視
 - agentparam/docreatedrop: 監視レベル
-  - 0: レベル2(update/selectでの監視) **(default)**
   - 2: レベル0(データベースステータス)
-  - 3: レベル1(selectでの監視) 
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)** 
 - agentparam/dbname: 接続文字列
 - agentparam/username: ユーザ名
 - agentparam/password: パスワード
@@ -278,7 +278,8 @@
 - agentparam/certificate: 認証方式
   - 0: SYSDBA **(default)**
   - 1: DEFAULT
-- agentparam/oraclehome: 監視テーブル名
+- agentparam/tablename: 監視テーブル名
+- agentparam/oraclehome: ORACLE_HOME
 - agentparam/characterset: 文字コード
   - (Following the setting of the application)
   - AMERICAN_AMERICA.US7ASCII

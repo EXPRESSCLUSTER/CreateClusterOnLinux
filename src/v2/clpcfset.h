@@ -11,6 +11,13 @@ enum _func_retval__
 	CONF_ERR_OTHER
 };
 
+enum _clp_os__
+{
+	CONF_OS_WIN,
+	CONF_OS_LIN
+};
+
+
 #define CONF_PATH_LEN		1024
 
 /**
@@ -44,7 +51,8 @@ int add_np_pingnp(char *id, char *priority, char *grpid, char *listid, char *ip)
 int add_np_disknp(char *id, char *priority);
 int add_np_httpnp(char *id, char *priority, char *host);
 int add_alertservice(void);
-int add_alert(char *srvname, char *id, char *type, char *info, char *user, char *password, char *rshpath, char *startvoice, char *stopovoice);
+int add_alert_win(char *srvname, char *id, char *type, char *info, char *user, char *password, char *rshpath, char *startvoice, char *stopovoice);
+int add_alert_lin(char *srvname, char *id, char *type, char *info, char *startvoice, char *stopovoice);
 int add_grp(char *grptype, char *grpname); 
 int add_grp_param(char *grptype, char *grpname, char *tag, char *param); 
 int add_rsc(char *grpname, char *rsctype, char *rscname); 
@@ -71,6 +79,7 @@ int count_monitor(void);
 int count_messages_cmdline(char *type, char *id, char *cmdline);
 int count_smtpsrv(void);
 int count_snmpsrv(void);
+int find_os(void);
 
 int add_rsc_guid(char *rsctype, char *rscname, char *srvname, char *tag, char *guid);
 #endif

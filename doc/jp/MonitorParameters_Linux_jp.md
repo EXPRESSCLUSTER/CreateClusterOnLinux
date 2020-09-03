@@ -7,14 +7,23 @@
 ## 目次
 - [共通パラメータ](#共通パラメータ)
 - [ディスクRWモニタリソース](#ディスクRWモニタリソース)
-- [フローティングIPモニタリソース](#フローティングIPモニタリソース)
-- [カスタムモニタリソース](#カスタムモニタリソース)
 - [IPモニタリソース](#IPモニタリソース)
+- [フローティングIPモニタリソース](#フローティングIPモニタリソース)
 - [PIDモニタリソース](#PIDモニタリソース)
+- [ユーザ空間モニタリソース](#ユーザ空間モニタリソース)
+- [カスタムモニタリソース](#カスタムモニタリソース)
+- [ボリュームマネージャモニタリソース](#ボリュームマネージャモニタリソース)
 - [仮想マシンモニタリソース](#仮想マシンモニタリソース)
 - [プロセス名モニタリソース](#プロセス名モニタリソース)
-- [ユーザ空間モニタリソース](#ユーザ空間モニタリソース)
-- [ボリュームマネージャモニタリソース](#ボリュームマネージャモニタリソース)
+- [DB2モニタリソース](#DB2モニタリソース)
+- [MySQLモニタリソース](#MySQLモニタリソース)
+- [ODBCモニタリソース](#ODBCモニタリソース)
+- [Oracleモニタリソース](#Oracleモニタリソース)
+- [OracleClusterware同期管理モニタリソース](#OracleClusterware同期管理モニタリソース)
+- [PostgreSQLモニタリソース](#PostgreSQLモニタリソース)
+- [Sambaモニタリソース](#Sambaモニタリソース)
+- [SQLServerモニタリソース](#SQLServerモニタリソース)
+- [Sybaseモニタリソース](#Sybaseモニタリソース)
 
 ## 共通パラメータ
 ### 監視 (共通)
@@ -160,24 +169,6 @@
 - parameters/size: I/Oサイズ
   - 監視方法がREAD(O_DIRECT)のときは512を指定してください。
 
-## フローティングIPモニタリソース
-### タイプ名: fipw
-- parameters/monmii: NIC Link Up/Downを監視する
-  - 0: 監視しない **(default)**
-  - 1: 監視する
-    ```bash
-    $ clpcfset add monparam genw genw1 parameters/monmii 1
-    ```
-
-## カスタムモニタリソース
-### タイプ名: genw
-- parameters/default: スクリプトのタイプ
-    - 0: ユーザアプリケーション
-    - 1: この製品で作成したスクリプト
-- parameters/path ファイル
-  - ユーザアプリケーションの場合: スクリプトの絶対パス
-  - この製品で作成したスクリプトの場合: genw.bat
-
 ## IPモニタリソース
 ### タイプ名: ipw
 - parameters/list@\<id\>/ip: IPアドレス
@@ -191,19 +182,18 @@
     $ clpcfset add monparam ipw ipw1 parameters/list@1/ip <IP アドレス>
     ```
 
+## フローティングIPモニタリソース
+### タイプ名: fipw
+- parameters/monmii: NIC Link Up/Downを監視する
+  - 0: 監視しない **(default)**
+  - 1: 監視する
+    ```bash
+    $ clpcfset add monparam genw genw1 parameters/monmii 1
+    ```
+
 ## PIDモニタリソース
 ### タイプ名: pidw
 - 固有のパラメータはありません。
-
-## 仮想マシンモニタリソース
-### タイプ名: vmw
-- parameters/object: 仮想マシンリソース
-- parameters/waittime: 外部マイグレーション発生時の待ち時間
-
-## プロセス名モニタリソース
-### タイプ名: psw
-- parameters/processname: プロセス名
-- parameters/processnum: プロセス数下限値
 
 ## ユーザ空間モニタリソース
 ### タイプ名: userw
@@ -220,9 +210,165 @@
     $ clpcfset add monparam userw userw1 parameters/action PANIC
     ```
 
+## カスタムモニタリソース
+### タイプ名: genw
+- parameters/default: スクリプトのタイプ
+    - 0: ユーザアプリケーション
+    - 1: この製品で作成したスクリプト
+- parameters/path ファイル
+  - ユーザアプリケーションの場合: スクリプトの絶対パス
+  - この製品で作成したスクリプトの場合: genw.bat
+
 ## ボリュームマネージャモニタリソース
 ### タイプ名: volmgrw
 - parameters/devname: VG 名を指定してください。
   ```bash
   $ clpcfset add monparam volmgrw volmgrw parameters/devname <VG 名>
   ```
+
+## 仮想マシンモニタリソース
+### タイプ名: vmw
+- parameters/object: 仮想マシンリソース
+- parameters/waittime: 外部マイグレーション発生時の待ち時間
+
+## プロセス名モニタリソース
+### タイプ名: psw
+- parameters/processname: プロセス名
+- parameters/processnum: プロセス数下限値
+
+## DB2モニタリソース
+### タイプ名: db2w
+- parameters/docreatedrop: 監視レベル
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+  - 1: レベル3(毎回create/dropも行う)
+- parameters/database: データベース名
+- parameters/instance: インスタンス名 **(default db2inst1)**
+- parameters/username: ユーザ名 **(default db2inst1)**
+- parameters/password: パスワード
+- parameters/table: 監視テーブル名 **(default db2watch)**
+- parameters/characterset: 文字コード
+  - en_US.iso88591
+  - ja_JP.eucJP
+  - ja_JP.sjis
+  - ja_JP.utf8
+  - zh_TW.big5
+  - zh_CN.eucCN
+  - zh_CN.gbk
+  - zh_CN.utf8
+- parameters/libraryfullpath: ライブラリパス
+
+## MySQLモニタリソース
+### タイプ名: mysqlw
+- parameters/docreatedrop: 監視レベル
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+  - 1: レベル3(毎回create/dropも行う)
+- parameters/database: データベース名
+- parameters/ipaddress: IPアドレス **(default 127.0.0.1)**
+- parameters/port: ポート番号 **(default 3306)**
+- parameters/username: ユーザ名
+- parameters/password: パスワード
+- parameters/table: 監視テーブル名 **(default mysqlwatch)**
+- parameters/engine: ストレージエンジン
+- parameters/libraryfullpath: ライブラリパス
+
+## ODBCモニタリソース
+### タイプ名: odbcw
+- parameters/monitorlevel: 監視レベル
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+  - 1: レベル3(毎回create/dropも行う)
+- parameters/datasource: データソース名
+- parameters/username: ユーザ名
+- parameters/password: パスワード
+- parameters/table: 監視テーブル名 **(default odbcwatch)**
+- parameters/characterset: メッセージ文字コード **(default UTF-8)**
+
+## Oracleモニタリソース
+### タイプ名: oraclew
+- parameters/monmethod: 監視方式
+  - 0: リスナーとインスタンスを監視 **(default)**
+  - 1: リスナーのみ監視
+  - 2: インスタンスのみ監視
+- parameters/docreatedrop: 監視レベル
+  - 2: レベル0(データベースステータス)
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)** 
+  - 1: レベル3(毎回create/dropも行う)
+- parameters/database: 接続文字列
+- parameters/username: ユーザ名
+- parameters/password: パスワード
+- parameters/authority: 認証方式
+  - 0: SYSDBA **(default)**
+  - 1: DEFAULT
+- parameters/table: 監視テーブル名 **(default orawatch)**
+- parameters/oraclehome: ORACLE_HOME
+- parameters/characterset: 文字コード
+- parameters/libraryfullpath: ライブラリパス
+- emergency/infocollect/use: 障害発生時にアプリケーションの障害情報を採取する
+  - 0: チェックしない **(default)**
+  - 1: チェックする
+- emergency/infocollect/timeout: 採取タイムアウト **(default 600)**
+- parameters/ignoreuse: Oracleの初期化中またはシャットダウン中をエラーにする  
+  - 0: チェックしない **(default)**
+  - 1: チェックする
+
+## OracleClusterware同期管理モニタリソース
+## タイプ名: osmw
+- 固有のパラメータはありません。
+
+## PostgreSQLモニタリソース
+### タイプ名: psqlw
+- parameters/docreatedrop: 監視レベル
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+  - 1: レベル3(毎回create/dropも行う)
+- parameters/database: データベース名
+- parameters/ipaddress: IPアドレス **(default 127.0.0.1)**
+- parameters/port: ポート番号 **(default 5432)**
+- parameters/username: ユーザ名 **(default postgres)**
+- parameters/password: パスワード
+- parameters/table: 監視テーブル名 **(default psqlwatch)**
+- parameters/libraryfullpath: ライブラリパス
+- parameters/ignoreuse: PostgreSQLの初期化中またはシャットダウン中をエラーにする
+  - 0: チェックしない
+  - 1: チェックする **(default)**
+
+## Sambaモニタリソース
+### タイプ名: sambaw
+- parameters/sharename: 共有名
+- parameters/ipaddress: IPアドレス **(default 127.0.0.1)**
+- parameters/port: ポート番号 **(default 139)**
+- parameters/username: ユーザ名
+- parameters/password: パスワード
+
+## SQLServerモニタリソース
+### タイプ名: sqlserverw
+- parameters/monitorlevel: 監視レベル
+  - 2: レベル0(データベースステータス)
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+  - 1: レベル3(毎回create/dropも行う)
+- parameters/dbname: データベース名
+- parameters/servername: サーバ名 **(default localhost)**
+- parameters/username: ユーザ名 **(default SA)**
+- parameters/password: パスワード
+- parameters/table: 監視テーブル名 **(default sqlwatch)**
+- parameters/odbcdriver: ODBCドライバ名
+  - ODBC Driver 13 for SQL Server
+  - ODBC Driver 17 for SQL Server
+
+## Sybaseモニタリソース
+### タイプ名: sybasew
+- parameters/docreatedrop: 監視レベル
+  - 2: レベル0(データベースステータス)
+  - 3: レベル1(selectでの監視)
+  - 0: レベル2(update/selectでの監視) **(default)**
+  - 1: レベル3(毎回create/dropも行う)
+- parameters/database: データベース名
+- parameters/dbservername: データベースサーバ名
+- parameters/username: ユーザ名 **(default sa)**
+- parameters/password: パスワード
+- parameters/table: 監視テーブル名 **(default sybwatch)**
+- parameters/libraryfullpath: ライブラリパス

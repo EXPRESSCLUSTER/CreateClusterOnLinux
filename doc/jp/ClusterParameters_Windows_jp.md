@@ -5,38 +5,14 @@
 - 各パラメータに入力可能な文字列や禁則文字列については、CLUSTERPRO のリファレンスガイドを参照してください。
 
 ## 目次
-- [リカバリ](#リカバリ)
 - [NP解決](#NP解決)
 - [監視](#監視)
+- [リカバリ](#リカバリ)
 - [アラートサービス](#アラートサービス)
 - [WebManager](#WebManager)
 - [アラートログ](#アラートログ)
 - [アカウント](#アカウント)
 
-## リカバリ
-- pm/exec0/recover: クラスタサービスのプロセス異常時動作
-- pm/exec1/recover
-  - 上記 2 つのパス全てに同じ値を設定してください。
-    ```bash
-    $ clpcfset add clsparam pm/exec0/recover 6
-    $ clpcfset add clsparam pm/exec1/recover 6
-    ```
-  |数値|最終動作|備考|
-  |----|---------|--|
-  |   5|緊急シャットダウン|**(default)**|
-  |   6|意図的なストップエラーの発生||
-  |   7|HWリセット||
-
-- cluster/rsctimeout/rsctoaction: グループリソースの活性/非活性ストール発生時動作
-  ```bash
-  $ clpcfset add clsparam cluster/rsctimeout/rsctoaction 0
-  ```
-  |数値|最終動作|備考|
-  |----|---------|--|
-  |既定値|クラスタサービス停止とOSシャットダウン||
-  |   0|何もしない(活性/非活性異常として扱う)||
-  |   5|緊急シャットダウン|**(default)**|
-  |   6|意図的なストップエラーの発生||
 
 ## NP解決
 - cluster/networkpartition/npaction: NP発生時動作
@@ -71,6 +47,31 @@
   - 0: チェックしない **(default)**
   - 1: チェックする
 
+## リカバリ
+- pm/exec0/recover: クラスタサービスのプロセス異常時動作
+- pm/exec1/recover
+  - 上記 2 つのパス全てに同じ値を設定してください。
+    ```bash
+    $ clpcfset add clsparam pm/exec0/recover 6
+    $ clpcfset add clsparam pm/exec1/recover 6
+    ```
+  |数値|最終動作|備考|
+  |----|---------|--|
+  |   5|緊急シャットダウン|**(default)**|
+  |   6|意図的なストップエラーの発生||
+  |   7|HWリセット||
+
+- cluster/rsctimeout/rsctoaction: グループリソースの活性/非活性ストール発生時動作
+  ```bash
+  $ clpcfset add clsparam cluster/rsctimeout/rsctoaction 0
+  ```
+  |数値|最終動作|備考|
+  |----|---------|--|
+  |既定値|クラスタサービス停止とOSシャットダウン||
+  |   0|何もしない(活性/非活性異常として扱う)||
+  |   5|緊急シャットダウン|**(default)**|
+  |   6|意図的なストップエラーの発生||
+
 ## アラートサービス
 - cluster/messages/use: アラート通報設定を有効にする
   - 0: チェックしない **(default)**
@@ -92,7 +93,7 @@
 ### メール通報
 - cluster/mail/address: メールアドレス
 - cluster/mail/subject: 件名
-- メール送信方法はSMTPのため、指定する必要はありません。
+- メール送信方法はSMTPのみのため、指定する必要はありません。
 - SMTP設定
   - cluster/mail/smtp/charset: メール送信文書の文字コード
     - Shift_JIS

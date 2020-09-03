@@ -5,51 +5,14 @@
 - 各パラメータに入力可能な文字列や禁則文字列については、CLUSTERPRO のリファレンスガイドを参照してください。
 
 ## 目次
-- [リカバリ](#リカバリ)
 - [NP解決](#NP解決)
 - [監視](#監視)
+- [リカバリ](#リカバリ)
+- [アラートサービス](#アラートサービス)
 - [WebManager](#WebManager)
+- [アラートログ](#アラートログ)
+- [OracleClusterware連携](#OracleClusterware連携)
 
-## リカバリ
-- pm/exec0/recover: クラスタサービスのプロセス異常時動作
-- pm/exec1/recover
-- pm/exec2/recover
-  - 上記 3 つのパス全てに同じ値を設定してください。
-    ```bash
-    $ clpcfset add clsparam pm/exec0/recover 7
-    $ clpcfset add clsparam pm/exec1/recover 7
-    $ clpcfset add clsparam pm/exec2/recover 7
-    ```
-  |数値|最終動作|備考|
-  |----|---------|--|
-  |   2|OSシャットダウン|**(default)**|
-  |   3|OS再起動||
-  |   5|sysrqパニック||
-  |   6|keepaliveリセット||
-  |   7|keepaliveパニック||
-  |   8|BMCリセット||
-  |   9|BMCパワーオフ||
-  |  10|BMCパワーサイクル||
-  |  11|BMC NMI||
-  |  12|I/O-Fencing(High-End Server Option)||
-
-- cluster/rsctimeout/rsctoaction: グループリソースの活性/非活性ストール発生時動作
-  ```bash
-  $ clpcfset add clsparam cluster/rsctimeout/rsctoaction 0
-  ```
-  |数値|最終動作|備考|
-  |----|---------|--|
-  |   0|何もしない(活性/非活性異常として扱う)||
-  |   2|クラスタサービス停止とOSシャットダウン|**(default)**|
-  |   3|クラスタサービス停止とOS再起動||
-  |   8|sysrqパニック||
-  |   9|keepaliveリセット||
-  |  10|keepaliveパニック||
-  |  11|BMCリセット||
-  |  12|BMCパワーオフ||
-  |  13|BMCパワーサイクル||
-  |  14|BMC NMI||
-  |  15|I/O-Fencing(High-End Server Option)||
 
 ## NP解決
 - cluster/networkpartition/npaction: NP発生時動作
@@ -97,6 +60,112 @@
   - 0: チェックしない **(default)**
   - 1: チェックする
 
+## リカバリ
+- pm/exec0/recover: クラスタサービスのプロセス異常時動作
+- pm/exec1/recover
+- pm/exec2/recover
+  - 上記 3 つのパス全てに同じ値を設定してください。
+    ```bash
+    $ clpcfset add clsparam pm/exec0/recover 7
+    $ clpcfset add clsparam pm/exec1/recover 7
+    $ clpcfset add clsparam pm/exec2/recover 7
+    ```
+  |数値|最終動作|備考|
+  |----|---------|--|
+  |   2|OSシャットダウン|**(default)**|
+  |   3|OS再起動||
+  |   5|sysrqパニック||
+  |   6|keepaliveリセット||
+  |   7|keepaliveパニック||
+  |   8|BMCリセット||
+  |   9|BMCパワーオフ||
+  |  10|BMCパワーサイクル||
+  |  11|BMC NMI||
+  |  12|I/O-Fencing(High-End Server Option)||
+
+- cluster/rsctimeout/rsctoaction: グループリソースの活性/非活性ストール発生時動作
+  ```bash
+  $ clpcfset add clsparam cluster/rsctimeout/rsctoaction 0
+  ```
+  |数値|最終動作|備考|
+  |----|---------|--|
+  |   0|何もしない(活性/非活性異常として扱う)||
+  |   2|クラスタサービス停止とOSシャットダウン|**(default)**|
+  |   3|クラスタサービス停止とOS再起動||
+  |   8|sysrqパニック||
+  |   9|keepaliveリセット||
+  |  10|keepaliveパニック||
+  |  11|BMCリセット||
+  |  12|BMCパワーオフ||
+  |  13|BMCパワーサイクル||
+  |  14|BMC NMI||
+  |  15|I/O-Fencing(High-End Server Option)||
+
+## アラートサービス
+- cluster/messages/use: アラート通報設定を有効にする
+  - 0: チェックしない **(default)**
+  - 1: チェックする
+- アラート送信先の変更
+  - メッセージの追加
+    ```
+    $ clpcfset add messages <モジュールタイプ> <イベントID> <Alert Logs> <Alert Extension> <Mail Report> <SNMP Trap> <System Log>
+
+    e.g.
+    $ clpcfset add messages apisv 123 1 1 1 0 0
+    ```
+    - カテゴリはモジュールタイプをもとに自動で判断されます。
+    - 送信先は 0: チェックしない、1: チェックする。
+  - メッセージにコマンドを追加
+    ```
+    $ clpcfset add messages cmdline <モジュールタイプ> <イベントID> <コマンド>
+    ```
+### メール通報
+- cluster/mail/address: メールアドレス
+- cluster/mail/subject: 件名 **(default CLUSTERPRO)**
+- cluster/mail/sendtype: メール送信方法
+  - MAIL **(default)**
+  - SMTP
+- SMTP設定
+  - cluster/mail/smtp/charset: メール送信文書の文字コード
+    - ISO-2022-jp
+    - US-ASCII
+    - GB2312
+  - cluster/mail/smtp/timeout: 通信応答待ち時間 **(default 30)**
+  - cluster/mail/smtp/subencode: 件名のエンコードをする
+    - 0: チェックしない **(default)**
+    - 1: チェックする
+  - SMTPサーバの追加
+    ```
+    $ clpcfset add smtpsrv <プライオリティ> <SMTPサーバ> <SMTPポート番号> <差出人メールアドレス> <SMTP認証を有効にする> <認証方式> <ユーザ名> <パスワード>
+    ```
+    - プライオリティは0から始まり、追加するたびに1ずつ増えていきます。
+    - SMTP認証を有効にする 0: チェックしない、1: チェックする
+    - 認証方式 CRAM-MD5, LOGIN, PLAIN
+    - 現在clpcfsetはパスワードの暗号化に対応していません。WebUIまたはWebManagerで一時的に設定ファイルを作成し、clp.confの中身に記載されている暗号化されたパスワードを確認してください。
+### SNMPトラップ
+- 送信先設定
+  - 送信先の追加
+    ```
+    $ clpcfset add snmpsrv <送信先サーバ> <SNMPポート番号> <SNMPバージョン> <SNMPコミュニティ名>
+    ```
+    - SNMPバージョン v1, v2c
+- cluster/syslog/format/level: syslogにログレベルを出力する
+  - 0: チェックしない
+  - 1: チェックする **(default)**
+- cluster/cialert/use: 筐体IDランプ連携を使用する
+  - 0: チェックしない **(default)**
+  - 1: チェックする
+- cluster/cialert/repeat: 繰り返し実行
+  - 0: 繰り返し実行しない
+  - 1: 繰り返し実行する **(default)**
+- cluster/cialert/execcmd_interval: インターバル **(default 120)**
+- ネットワーク警告灯を使用する
+
+  使用するには以下のコマンドを実行してください。
+  ```
+  $ clpcfset add alertservice
+  ```
+
 ## WebManager
 - webmgr/security/clientlist/iprest: クライアントのIPアドレスによって接続を制御する
   - 0: チェックしない **(default)**
@@ -109,3 +178,16 @@
     $ clpcfset add webmgr clientlist 192.168.100.1
     $ clpcfset add webmgr clientlist 192.168.200.0/24
     ```
+
+## アラートログ
+- webalert/use: アラートサービスを有効にする
+  - 0: チェックしない
+  - 1: チェックする **(default)**
+- webalert/main/alertlog/maxrecordcount: 保存最大アラートレコード数 **(default 10000)**
+- 方法は unicast のみのため指定する必要はありません。
+- webalert/daemon/timeout: 通信タイムアウト **(default 30)**
+
+## OracleClusterware連携
+- cluster/ocw/use: Oracle Cluster ware連携機能を有効にする
+  - 0: チェックしない **(default)**
+  - 1: チェックする
