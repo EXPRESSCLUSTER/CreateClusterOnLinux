@@ -1473,14 +1473,17 @@ add_grp(
 	ret = count_group();
 	sprintf(gid, "%d", ret);
 
-	sprintf(path, "/root/group@%s/type", grpname);
-	ret = set_value(g_doc, path, grptype);
-	if (ret)
+	if (strcmp(grptype, "failover"))
 	{
-		printf("set_value() failed. (ret: %d)\n", ret);
-		ret = CONF_ERR_FILE;
+		sprintf(path, "/root/group@%s/type", grpname);
+		ret = set_value(g_doc, path, grptype);
+		if (ret)
+		{
+			printf("set_value() failed. (ret: %d)\n", ret);
+			ret = CONF_ERR_FILE;
+		}
 	}
-
+	
 	sprintf(path, "/root/group@%s/comment", grpname);
 	ret = set_value(g_doc, path, "");
 	if (ret)
